@@ -10,7 +10,7 @@ This document provides AI-specific guidelines for reviewing and contributing to 
 - **State Management**: Pinia
 - **Routing**: File-based routing (app/pages/)
 - **Testing**: Vitest (unit) + Playwright (E2E)
-- **Code Quality**: ESLint 9 + Prettier 3 + Husky
+- **Code Quality**: ESLint 9 + Prettier 3
 
 ## Nuxt 4 Architecture
 

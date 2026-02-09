@@ -28,6 +28,7 @@ This document defines the coding standards and best practices for our Nuxt 4 pro
 ### Before Committing
 
 Always run:
+
 ```bash
 pnpm run lint        # Check for linting errors
 pnpm run format      # Format code with Prettier
@@ -66,16 +67,16 @@ shared/           # Code shared between app and server
 
 ### File Placement Rules
 
-| Code Type | Location |
-|-----------|----------|
-| Vue Components | `app/components/` |
-| Page Components | `app/pages/` |
-| Layouts | `app/layouts/` |
-| Composables | `app/composables/` |
-| API Endpoints | `server/api/` |
-| Server Utilities | `server/utils/` |
-| Shared Types | `shared/types/` |
-| Shared Constants | `shared/` |
+| Code Type        | Location           |
+| ---------------- | ------------------ |
+| Vue Components   | `app/components/`  |
+| Page Components  | `app/pages/`       |
+| Layouts          | `app/layouts/`     |
+| Composables      | `app/composables/` |
+| API Endpoints    | `server/api/`      |
+| Server Utilities | `server/utils/`    |
+| Shared Types     | `shared/types/`    |
+| Shared Constants | `shared/`          |
 
 ---
 
@@ -113,12 +114,12 @@ import logoUrl from '~/assets/logo.svg'
 
 ```typescript
 // ✅ GOOD: Descriptive names
-const getUserById = (id: string): Promise<User> => { }
+const getUserById = (id: string): Promise<User> => {}
 const isLoading = ref(false)
 
 // ❌ BAD: Abbreviations, unclear names
-const getUsr = (i: string) => { }  // Wrong!
-const ld = ref(false)  // Wrong!
+const getUsr = (i: string) => {} // Wrong!
+const ld = ref(false) // Wrong!
 ```
 
 ---
@@ -132,7 +133,7 @@ const ld = ref(false)  // Wrong!
 // 1. Define page metadata (if page)
 definePageMeta({
   layout: 'default',
-  middleware: ['auth']
+  middleware: ['auth'],
 })
 
 // 2. Props interface (if component)
@@ -141,7 +142,7 @@ interface Props {
   count?: number
 }
 const props = withDefaults(defineProps<Props>(), {
-  count: 0
+  count: 0,
 })
 
 // 3. Emits interface (if component)
@@ -162,10 +163,10 @@ const { data, pending, error } = await useFetch('/api/users')
 const localState = ref('')
 
 // 7. Computed properties
-const computed = computed(() => { })
+const computed = computed(() => {})
 
 // 8. Methods
-const handleClick = (): void => { }
+const handleClick = (): void => {}
 </script>
 
 <template>
@@ -183,24 +184,25 @@ const handleClick = (): void => { }
 <!-- ✅ GOOD: Use useFetch for API calls in pages -->
 <script setup lang="ts">
 // For API calls
-const { data: users, pending, error, refresh } = await useFetch('/api/users', {
+const {
+  data: users,
+  pending,
+  error,
+  refresh,
+} = await useFetch('/api/users', {
   // Unique key for caching
   key: 'users',
   // Watch for changes
   watch: [() => route.query],
   // Transform response
-  transform: (data: User[]) => data.filter(u => u.active)
+  transform: (data: User[]) => data.filter((u) => u.active),
 })
 
 // For any async operation
-const { data: time } = await useAsyncData(
-  'time',
-  () => $fetch('/api/time'),
-  {
-    // Cache for 60 seconds
-    getCachedData: key => useNuxtData(key).data
-  }
-)
+const { data: time } = await useAsyncData('time', () => $fetch('/api/time'), {
+  // Cache for 60 seconds
+  getCachedData: (key) => useNuxtData(key).data,
+})
 </script>
 ```
 
@@ -240,7 +242,7 @@ export default defineEventHandler(async (event) => {
   // Return response
   return {
     users: [],
-    timestamp: Date.now()
+    timestamp: Date.now(),
   }
 })
 
@@ -254,7 +256,7 @@ export default defineEventHandler(async (event) => {
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'User ID is required'
+      statusMessage: 'User ID is required',
     })
   }
 
@@ -264,7 +266,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'User not found'
+      statusMessage: 'User not found',
     })
   }
 
@@ -281,7 +283,7 @@ export default defineEventHandler(async (event) => {
   if (!body.name || !body.email) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Name and email are required'
+      statusMessage: 'Name and email are required',
     })
   }
 
@@ -313,7 +315,7 @@ export type UserRole = 'admin' | 'user' | 'guest'
 export const API_BASE_URL = '/api'
 export const USER_ROLES = ['admin', 'user', 'guest'] as const
 
-export type UserRole = typeof USER_ROLES[number]
+export type UserRole = (typeof USER_ROLES)[number]
 
 // Can be imported anywhere
 // import type { User } from '~/shared/types/user'
@@ -393,7 +395,8 @@ export default defineNitroPlugin((nitroApp) => {
     </header>
 
     <main>
-      <slot />  <!-- Page content -->
+      <slot />
+      <!-- Page content -->
     </main>
 
     <footer>
@@ -405,7 +408,7 @@ export default defineNitroPlugin((nitroApp) => {
 <!-- Use in page -->
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 </script>
 ```
@@ -455,7 +458,8 @@ function calculateTotal(prices: number[]): number {
 }
 
 // ❌ BAD: Any type
-function calculateTotal(prices: any): any {  // Wrong!
+function calculateTotal(prices: any): any {
+  // Wrong!
   return prices.reduce((sum: any, price: any) => sum + price, 0)
 }
 ```
@@ -522,15 +526,15 @@ export default defineNuxtConfig({
 
     // Public (exposed to client)
     public: {
-      apiBase: process.env.API_BASE_URL || '/api'
-    }
-  }
+      apiBase: process.env.API_BASE_URL || '/api',
+    },
+  },
 })
 
 // Use in app
 const config = useRuntimeConfig()
-const apiBase = config.public.apiBase  // Available on client and server
-const apiSecret = config.apiSecret      // Server-only
+const apiBase = config.public.apiBase // Available on client and server
+const apiSecret = config.apiSecret // Server-only
 ```
 
 ---
@@ -566,7 +570,7 @@ import { describe, it, expect } from 'vitest'
 import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
 await setup({
-  server: true
+  server: true,
 })
 
 describe('API Endpoints', () => {
@@ -686,8 +690,8 @@ export default defineNuxtConfig({
     // Dynamic page - no caching
     '/admin/**': { isr: false },
     // Static assets - cache for 1 year
-    '/images/**': { isr: 31536000 }
-  }
+    '/images/**': { isr: 31536000 },
+  },
 })
 ```
 
@@ -696,9 +700,7 @@ export default defineNuxtConfig({
 ```vue
 <!-- ✅ GOOD: Lazy load heavy components -->
 <script setup lang="ts">
-const HeavyChart = defineAsyncComponent(() =>
-  import('~/components/features/HeavyChart.vue')
-)
+const HeavyChart = defineAsyncComponent(() => import('~/components/features/HeavyChart.vue'))
 </script>
 
 <template>
@@ -735,7 +737,7 @@ export default defineEventHandler(async (event) => {
   if (!body.email || !body.password) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Email and password are required'
+      statusMessage: 'Email and password are required',
     })
   }
 
@@ -744,7 +746,7 @@ export default defineEventHandler(async (event) => {
   if (!emailRegex.test(body.email)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid email format'
+      statusMessage: 'Invalid email format',
     })
   }
 
@@ -801,9 +803,6 @@ pnpm run type-check   # TypeScript type check
 # Testing
 pnpm run test         # Run unit tests
 pnpm run test:e2e     # Run E2E tests
-
-# Git
-pnpm run prepare      # Setup Husky hooks
 ```
 
 ### Nuxt Auto-Imports
@@ -827,6 +826,7 @@ All components in app/components/ are auto-imported
 ## References & External Resources
 
 Official Documentation:
+
 - [Nuxt 4 Documentation](https://nuxt.com/docs) - Core Nuxt concepts
 - [Nuxt 4 Migration Guide](https://nuxt.com/docs/getting-started/upgrading) - Upgrading to Nuxt 4
 - [Nitro Documentation](https://nitro.unjs.io/) - Server engine

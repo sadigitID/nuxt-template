@@ -12,7 +12,6 @@ A production-ready Nuxt 4 template with TypeScript, ESLint, Prettier, Vitest, Pl
 - **Playwright** for E2E testing
 - **ESLint 9** for code linting
 - **Prettier 3** for code formatting
-- **Husky** for Git hooks
 - **Docker** for containerization
 - **GitHub Actions** CI/CD workflows
 
