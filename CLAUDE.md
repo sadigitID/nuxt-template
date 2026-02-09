@@ -8,7 +8,7 @@ This document provides AI-specific guidelines for reviewing and contributing to 
 - **Structure**: New Nuxt 4 app/ directory structure
 - **Language**: TypeScript (strict mode)
 - **State Management**: Pinia
-- **Routing**: File-based routing (pages/)
+- **Routing**: File-based routing (app/pages/)
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **Code Quality**: ESLint 9 + Prettier 3 + Husky
 
@@ -107,7 +107,7 @@ export const useCounter = (initialValue = 0) => {
 
   return {
     count,
-    increment
+    increment,
   }
 }
 
@@ -124,15 +124,12 @@ export const useCounter = (initialValue = 0) => {
 const { data: users, pending, error } = await useFetch('/api/users')
 
 // For any async operation
-const { data: time } = await useAsyncData(
-  'time',
-  () => $fetch('/api/time')
-)
+const { data: time } = await useAsyncData('time', () => $fetch('/api/time'))
 
 // With parameters
 const { data: user } = await useFetch(`/api/users/${route.params.id}`, {
-  key: `user-${route.params.id}`,  // Unique key for caching
-  watch: [() => route.params.id]   // Refetch when param changes
+  key: `user-${route.params.id}`, // Unique key for caching
+  watch: [() => route.params.id], // Refetch when param changes
 })
 </script>
 
@@ -158,7 +155,7 @@ export default defineEventHandler(async (event) => {
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'User ID is required'
+      statusMessage: 'User ID is required',
     })
   }
 
@@ -168,7 +165,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'User not found'
+      statusMessage: 'User not found',
     })
   }
 
@@ -338,7 +335,7 @@ export default defineEventHandler((event) => {
   // Add CORS headers
   setHeaders(event, {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE'
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
   })
 })
 ```
@@ -395,7 +392,8 @@ export default defineNitroPlugin((nitroApp) => {
     </header>
 
     <main>
-      <slot />  <!-- Page content renders here -->
+      <slot />
+      <!-- Page content renders here -->
     </main>
 
     <footer>
@@ -409,7 +407,7 @@ export default defineNitroPlugin((nitroApp) => {
 <!-- Use layout in page -->
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 </script>
 ```
@@ -476,15 +474,15 @@ export default defineNuxtConfig({
 
     // Public (exposed to client)
     public: {
-      apiBase: process.env.API_BASE_URL || '/api'
-    }
-  }
+      apiBase: process.env.API_BASE_URL || '/api',
+    },
+  },
 })
 
 // Use in app
 const config = useRuntimeConfig()
-const apiBase = config.public.apiBase  // Available on client and server
-const apiSecret = config.apiSecret      // Server-only
+const apiBase = config.public.apiBase // Available on client and server
+const apiSecret = config.apiSecret // Server-only
 ```
 
 ## Performance Optimization
@@ -494,9 +492,7 @@ const apiSecret = config.apiSecret      // Server-only
 ```vue
 <!-- ✅ GOOD: Lazy load heavy components -->
 <script setup lang="ts">
-const HeavyChart = defineAsyncComponent(() =>
-  import('~/components/features/HeavyChart.vue')
-)
+const HeavyChart = defineAsyncComponent(() => import('~/components/features/HeavyChart.vue'))
 </script>
 
 <template>
@@ -509,13 +505,7 @@ const HeavyChart = defineAsyncComponent(() =>
 ```vue
 <!-- ✅ GOOD: Use Nuxt Image for optimized images -->
 <template>
-  <NuxtImg
-    src="/images/hero.jpg"
-    width="800"
-    height="600"
-    loading="lazy"
-    format="webp"
-  />
+  <NuxtImg src="/images/hero.jpg" width="800" height="600" loading="lazy" format="webp" />
 </template>
 ```
 
@@ -533,8 +523,8 @@ export default defineNuxtConfig({
     // Dynamic page - no caching
     '/admin/**': { isr: false },
     // Static assets - cache for 1 year
-    '/images/**': { isr: 31536000 }
-  }
+    '/images/**': { isr: 31536000 },
+  },
 })
 ```
 
@@ -569,7 +559,7 @@ import { describe, it, expect } from 'vitest'
 import { $fetch, setup } from '@nuxt/test-utils/e2e'
 
 await setup({
-  server: true
+  server: true,
 })
 
 describe('API Endpoints', () => {

@@ -70,14 +70,14 @@ test/
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build for production |
-| `pnpm generate` | Generate static site |
-| `pnpm preview` | Preview production build |
-| `pnpm test` | Run unit tests |
-| `pnpm test:e2e` | Run E2E tests |
-| `pnpm lint` | Run ESLint |
-| `pnpm format` | Format with Prettier |
-| `pnpm type-check` | TypeScript type check |
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `pnpm dev`        | Start development server |
+| `pnpm build`      | Build for production     |
+| `pnpm generate`   | Generate static site     |
+| `pnpm preview`    | Preview production build |
+| `pnpm test`       | Run unit tests           |
+| `pnpm test:e2e`   | Run E2E tests            |
+| `pnpm lint`       | Run ESLint               |
+| `pnpm format`     | Format with Prettier     |
+| `pnpm type-check` | TypeScript type check    |
