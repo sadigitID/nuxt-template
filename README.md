@@ -4,25 +4,26 @@ A production-ready Nuxt 4 template with TypeScript, Tailwind CSS, SEO, and best 
 
 ## Features
 
-| Feature        | Package                     | Description                                    |
-| -------------- | --------------------------- | ---------------------------------------------- |
-| **Framework**  | `nuxt` v4                   | Nuxt 4 with `app/` directory structure         |
-| **Language**   | `typescript`                | Strict mode enabled                            |
-| **Styling**    | `@nuxtjs/tailwindcss`       | Utility-first CSS framework                    |
-| **Icons**      | `@nuxt/icon`                | 200k+ icons via Iconify (Lucide, Simple Icons) |
-| **Images**     | `@nuxt/image`               | Automatic image optimization (avif, webp)      |
-| **Fonts**      | `@nuxt/fonts`               | Automatic font optimization                    |
-| **SEO**        | `@nuxtjs/seo`               | Sitemap, robots, OG image, schema.org          |
-| **Color Mode** | `@nuxtjs/color-mode`        | Dark/light mode with system preference         |
-| **State**      | `@pinia/nuxt`               | Pinia stores with auto-import                  |
-| **Utilities**  | `@vueuse/nuxt`              | 200+ Vue composition utilities                 |
-| **Validation** | `zod`                       | Runtime type validation                        |
-| **Dates**      | `date-fns`                  | Date utility library                           |
-| **Linting**    | `@nuxt/eslint` + `prettier` | ESLint 9 + Prettier 3                          |
-| **Unit Tests** | `vitest`                    | Fast unit testing                              |
-| **E2E Tests**  | `@playwright/test`          | Cross-browser E2E testing                      |
-| **CI/CD**      | GitHub Actions              | Lint, type-check, test, build                  |
-| **Docker**     | Dockerfile + Compose        | Production containerization                    |
+| Feature        | Package                     | Description                                     |
+| -------------- | --------------------------- | ----------------------------------------------- |
+| **Framework**  | `nuxt` v4                   | Nuxt 4 with `app/` directory structure          |
+| **Language**   | `typescript`                | Strict mode enabled                             |
+| **Styling**    | `@nuxtjs/tailwindcss`       | Utility-first CSS framework                     |
+| **Icons**      | `@nuxt/icon`                | 200k+ icons via Iconify (Lucide, Simple Icons)  |
+| **Images**     | `@nuxt/image`               | Automatic image optimization (avif, webp)       |
+| **Fonts**      | `@nuxt/fonts`               | Automatic font optimization                     |
+| **SEO**        | `@nuxtjs/seo`               | Sitemap, robots, OG image, schema.org           |
+| **Color Mode** | `@nuxtjs/color-mode`        | Dark/light mode with system preference          |
+| **State**      | `@pinia/nuxt`               | Pinia stores with auto-import                   |
+| **Utilities**  | `@vueuse/nuxt`              | 200+ Vue composition utilities                  |
+| **Validation** | `zod`                       | Runtime type validation                         |
+| **Dates**      | `date-fns`                  | Date utility library                            |
+| **Linting**    | `@nuxt/eslint` + `prettier` | ESLint 9 + Prettier 3                           |
+| **Git Hooks**  | `husky` + `lint-staged`     | Pre-commit lint & format, commit msg validation |
+| **Unit Tests** | `vitest`                    | Fast unit testing                               |
+| **E2E Tests**  | `@playwright/test`          | Cross-browser E2E testing                       |
+| **CI/CD**      | GitHub Actions              | Lint, type-check, test, build                   |
+| **Docker**     | Dockerfile + Compose        | Production containerization                     |
 
 ## Quick Start
 
@@ -91,6 +92,7 @@ nuxt-template/
 ├── .prettierrc.json              # Prettier configuration
 ├── vitest.config.ts              # Vitest configuration
 ├── playwright.config.ts          # Playwright configuration
+├── commitlint.config.mjs         # Commitlint configuration
 ├── Dockerfile                    # Docker build
 └── docker-compose.yml            # Docker Compose
 ```
@@ -250,6 +252,25 @@ docker compose up -d
 | [CLAUDE.md](./CLAUDE.md) | AI code review guidelines                             |
 
 ## Before Committing
+
+Git hooks are configured via Husky and run automatically:
+
+- **pre-commit** -- runs `lint-staged` (ESLint fix + Prettier on staged files)
+- **commit-msg** -- validates commit message format via commitlint
+
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat: add user authentication
+fix: resolve login redirect loop
+docs: update API documentation
+style: fix button alignment
+refactor: extract validation logic
+test: add unit tests for auth composable
+chore: update dependencies
+```
+
+You can also run checks manually:
 
 ```bash
 pnpm run lint:fix     # Fix lint errors

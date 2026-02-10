@@ -1013,7 +1013,7 @@ chore/update-deps                 # Dependency updates
 
 ### Commit Messages
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+Follow [Conventional Commits](https://www.conventionalcommits.org/). This is enforced by commitlint via Husky's `commit-msg` hook.
 
 ```
 feat: add user authentication flow
@@ -1024,11 +1024,32 @@ test: add unit tests for useCounter
 chore: upgrade Nuxt to v4.2
 perf: lazy load dashboard charts
 ci: add type-check step to CI pipeline
+style: fix button alignment on mobile
+build: update Docker configuration
+revert: revert "feat: add user authentication flow"
 ```
+
+Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+
+### Git Hooks (Husky)
+
+Git hooks run automatically on every commit:
+
+| Hook         | Action                         | Tool        |
+| ------------ | ------------------------------ | ----------- |
+| `pre-commit` | Lint & format staged files     | lint-staged |
+| `commit-msg` | Validate commit message format | commitlint  |
+
+**pre-commit** runs `lint-staged`, which:
+
+- Runs `eslint --fix` + `prettier --write` on staged `*.{js,ts,vue}` files.
+- Runs `prettier --write` on staged `*.{json,md,yml,yaml}` files.
+
+**commit-msg** validates that the commit message follows Conventional Commits format.
 
 ### Before Committing
 
-Always run:
+The hooks handle lint and format automatically, but you can also run checks manually:
 
 ```bash
 pnpm run lint:fix     # Fix lint errors
