@@ -1,142 +1,362 @@
-# Nuxt 4 Template - Team Coding Standards
+# Nuxt 4 Template - Development Rules & Conventions
 
-This document defines the coding standards and best practices for our Nuxt 4 projects. All team members must follow these guidelines.
+This document defines the coding standards, naming conventions, file structure, and best practices for this Nuxt 4 project. All contributors must follow these guidelines.
+
+---
 
 ## Table of Contents
 
-- [General Principles](#general-principles)
-- [Nuxt 4 Architecture](#nuxt-4-architecture)
-- [Code Style](#code-style)
-- [Vue/Nuxt Standards](#vuenuxt-standards)
+- [Directory Structure](#directory-structure)
+- [File Naming Conventions](#file-naming-conventions)
+- [Component Guidelines](#component-guidelines)
+- [Composables Guidelines](#composables-guidelines)
+- [Page Guidelines](#page-guidelines)
+- [Layout Guidelines](#layout-guidelines)
+- [Middleware Guidelines](#middleware-guidelines)
+- [Plugin Guidelines](#plugin-guidelines)
+- [Store Guidelines (Pinia)](#store-guidelines-pinia)
+- [Server API Guidelines](#server-api-guidelines)
+- [Shared Code Guidelines](#shared-code-guidelines)
 - [TypeScript Standards](#typescript-standards)
+- [Tailwind CSS Standards](#tailwind-css-standards)
+- [SSR Compatibility](#ssr-compatibility)
+- [Data Fetching](#data-fetching)
+- [Error Handling](#error-handling)
 - [Testing Standards](#testing-standards)
 - [Git Workflow](#git-workflow)
-- [References](#references)
+- [Performance Guidelines](#performance-guidelines)
+- [Security Guidelines](#security-guidelines)
+- [Quick Reference](#quick-reference)
 
 ---
 
-## General Principles
-
-### Core Values
-
-1. **SSR-First** - Code must work on both server and client
-2. **Auto-Imports** - Leverage Nuxt's auto-import capabilities
-3. **Explicit over Implicit** - Make intentions clear
-4. **Type Safety** - TypeScript strict mode enabled
-5. **Immutability** - Avoid mutation, prefer functional patterns
-
-### Before Committing
-
-Always run:
-
-```bash
-pnpm run lint        # Check for linting errors
-pnpm run format      # Format code with Prettier
-pnpm run type-check  # Verify TypeScript types
-pnpm run test        # Run all tests
-```
-
----
-
-## Nuxt 4 Architecture
-
-### Directory Structure
+## Directory Structure
 
 ```
-app/              # Main application code (NEW in Nuxt 4)
-├── components/   # Auto-imported components
-├── composables/  # Auto-imported composition functions
-├── layouts/      # Layout wrappers
-├── middleware/   # Route middleware
-├── pages/        # File-based routing
-├── plugins/      # Vue plugins
-└── utils/        # Client utilities
-
-server/           # Server-side code (Nitro)
-├── api/          # API endpoints (auto-routes)
-├── middleware/   # Server middleware
-├── plugins/      # Server plugins
-├── routes/       # Server routes
-└── utils/        # Server utilities
-
-shared/           # Code shared between app and server
-├── types/        # Shared TypeScript types
-├── constants.ts  # Shared constants
-└── utils.ts      # Shared utilities
+nuxt-template/
+├── app/                          # Application code (Nuxt 4)
+│   ├── assets/                   # Static assets (processed by bundler)
+│   │   └── css/
+│   │       └── main.css          # Global CSS (Tailwind entry)
+│   ├── components/               # Auto-imported Vue components
+│   │   ├── common/               # Reusable UI components (Button, Modal, etc.)
+│   │   └── features/             # Feature-specific components (UserCard, etc.)
+│   ├── composables/              # Auto-imported composition functions
+│   ├── layouts/                  # Layout wrappers
+│   ├── middleware/               # Route middleware (client-side)
+│   ├── pages/                    # File-based routing
+│   ├── plugins/                  # Vue plugins
+│   ├── stores/                   # Pinia stores
+│   └── utils/                    # Client utilities (auto-imported)
+│
+├── server/                       # Server-side code (Nitro)
+│   ├── api/                      # API endpoints (auto-routed)
+│   ├── middleware/                # Server middleware
+│   ├── plugins/                  # Server/Nitro plugins
+│   ├── routes/                   # Server routes
+│   └── utils/                    # Server utilities (auto-imported)
+│
+├── shared/                       # Shared between app and server
+│   ├── constants/                # Shared constants
+│   ├── types/                    # Shared TypeScript types
+│   └── utils/                    # Shared utility functions
+│
+├── public/                       # Static files (served as-is)
+├── test/                         # Test files
+│   ├── unit/                     # Vitest unit tests
+│   └── e2e/                      # Playwright E2E tests
+│
+├── .github/workflows/            # GitHub Actions CI/CD
+├── nuxt.config.ts                # Nuxt configuration
+├── app.config.ts                 # App configuration (runtime)
+├── tailwind.config.ts            # Tailwind CSS configuration (if needed)
+├── tsconfig.json                 # TypeScript configuration
+├── eslint.config.mjs             # ESLint configuration
+├── .prettierrc.json              # Prettier configuration
+├── vitest.config.ts              # Vitest configuration
+├── playwright.config.ts          # Playwright configuration
+├── Dockerfile                    # Docker build configuration
+└── docker-compose.yml            # Docker Compose configuration
 ```
 
 ### File Placement Rules
 
-| Code Type        | Location           |
-| ---------------- | ------------------ |
-| Vue Components   | `app/components/`  |
-| Page Components  | `app/pages/`       |
-| Layouts          | `app/layouts/`     |
-| Composables      | `app/composables/` |
-| API Endpoints    | `server/api/`      |
-| Server Utilities | `server/utils/`    |
-| Shared Types     | `shared/types/`    |
-| Shared Constants | `shared/`          |
+| Code Type         | Location             | Auto-imported |
+| ----------------- | -------------------- | ------------- |
+| Vue Components    | `app/components/`    | Yes           |
+| Page Components   | `app/pages/`         | -             |
+| Layouts           | `app/layouts/`       | -             |
+| Composables       | `app/composables/`   | Yes           |
+| Client Utilities  | `app/utils/`         | Yes           |
+| Route Middleware  | `app/middleware/`    | -             |
+| Vue Plugins       | `app/plugins/`       | Yes           |
+| Pinia Stores      | `app/stores/`        | Yes           |
+| API Endpoints     | `server/api/`        | -             |
+| Server Middleware | `server/middleware/` | -             |
+| Server Utilities  | `server/utils/`      | Yes           |
+| Server Plugins    | `server/plugins/`    | -             |
+| Shared Types      | `shared/types/`      | Yes           |
+| Shared Constants  | `shared/constants/`  | Yes           |
+| Shared Utilities  | `shared/utils/`      | Yes           |
+| Static Assets     | `public/`            | -             |
+| Bundled Assets    | `app/assets/`        | -             |
+| Unit Tests        | `test/unit/`         | -             |
+| E2E Tests         | `test/e2e/`          | -             |
 
 ---
 
-## Code Style
+## File Naming Conventions
 
-### File Naming
+### General Rules
+
+- Use **English** for all file names, variable names, and comments.
+- Avoid abbreviations unless universally understood (e.g., `id`, `url`, `api`).
+- File names must be descriptive and reflect their content.
+
+### Components (`app/components/`)
+
+**Convention: `PascalCase.vue`**
+
+Components are organized in subdirectories by category. The directory name becomes part of the auto-import name.
 
 ```
-Components:    PascalCase      (UserProfile.vue)
-Pages:         kebab-case      (user-profile.vue)
-Layouts:        kebab-case      (default.vue, admin.vue)
-Composables:   camelCase       (useUserData.ts)
-Middleware:    kebab-case      (auth.ts)
-Plugins:       kebab-case      (vue-tooltip.ts)
-API Routes:    kebab-case      (users/[id].ts)
+app/components/
+├── common/                       # Reusable base components
+│   ├── Button.vue                # -> <CommonButton />
+│   ├── Modal.vue                 # -> <CommonModal />
+│   ├── Input.vue                 # -> <CommonInput />
+│   ├── ColorModeToggle.vue       # -> <CommonColorModeToggle />
+│   └── DataTable.vue             # -> <CommonDataTable />
+├── features/                     # Feature-specific components
+│   ├── UserCard.vue              # -> <FeaturesUserCard />
+│   ├── ProductList.vue           # -> <FeaturesProductList />
+│   └── DashboardChart.vue        # -> <FeaturesDashboardChart />
+└── layout/                       # Layout-related components
+    ├── Navbar.vue                # -> <LayoutNavbar />
+    ├── Sidebar.vue               # -> <LayoutSidebar />
+    └── Footer.vue                # -> <LayoutFooter />
 ```
 
-### Imports Order
+Rules:
 
-```typescript
-// 1. External libraries (if needed - most are auto-imported)
-import type { Ref } from 'vue'
+- Always use `PascalCase` for component files.
+- Group by function: `common/` for reusable, `features/` for domain-specific.
+- Component names should be nouns or noun phrases.
+- Avoid generic names like `Item.vue` or `List.vue` without context.
 
-// 2. Nuxt imports (if needed - most are auto-imported)
-// No import needed for useRoute, useRouter, useFetch, etc.
+### Pages (`app/pages/`)
 
-// 3. Internal types
-import type { User } from '~/shared/types/user'
+**Convention: `kebab-case.vue`**
 
-// 4. Static assets (if needed)
-import logoUrl from '~/assets/logo.svg'
+```
+app/pages/
+├── index.vue                     # Route: /
+├── about.vue                     # Route: /about
+├── contact.vue                   # Route: /contact
+├── users/
+│   ├── index.vue                 # Route: /users
+│   └── [id].vue                  # Route: /users/:id (dynamic)
+├── blog/
+│   ├── index.vue                 # Route: /blog
+│   └── [slug].vue                # Route: /blog/:slug
+└── admin/
+    ├── index.vue                 # Route: /admin
+    └── settings.vue              # Route: /admin/settings
 ```
 
-### Naming Conventions
+Rules:
 
-```typescript
-// ✅ GOOD: Descriptive names
-const getUserById = (id: string): Promise<User> => {}
-const isLoading = ref(false)
+- Always use `kebab-case` for page files.
+- Use `index.vue` for directory root routes.
+- Use `[param].vue` for dynamic route parameters.
+- Use `[...slug].vue` for catch-all routes.
+- Nested directories = nested routes.
 
-// ❌ BAD: Abbreviations, unclear names
-const getUsr = (i: string) => {} // Wrong!
-const ld = ref(false) // Wrong!
+### Layouts (`app/layouts/`)
+
+**Convention: `kebab-case.vue`**
+
+```
+app/layouts/
+├── default.vue                   # Default layout
+├── auth.vue                      # Auth pages layout (login, register)
+└── admin.vue                     # Admin panel layout
+```
+
+### Composables (`app/composables/`)
+
+**Convention: `useCamelCase.ts`**
+
+```
+app/composables/
+├── useCounter.ts                 # Counter logic
+├── useAuth.ts                    # Authentication state
+├── useForm.ts                    # Form handling
+└── useNotification.ts            # Notification system
+```
+
+Rules:
+
+- Always prefix with `use`.
+- Each file exports one primary composable function.
+- Name must describe the functionality.
+
+### Middleware (`app/middleware/`)
+
+**Convention: `kebab-case.ts`**
+
+```
+app/middleware/
+├── auth.ts                       # Authentication check
+├── guest.ts                      # Guest-only pages
+└── admin-only.ts                 # Admin role check
+```
+
+### Plugins (`app/plugins/`)
+
+**Convention: `kebab-case.ts`**
+
+```
+app/plugins/
+├── error-handler.ts              # Global error handler
+├── analytics.client.ts           # Client-only analytics plugin
+└── logger.server.ts              # Server-only logger plugin
+```
+
+Rules:
+
+- Use `.client.ts` suffix for client-only plugins.
+- Use `.server.ts` suffix for server-only plugins.
+- No suffix = runs on both client and server.
+
+### Pinia Stores (`app/stores/`)
+
+**Convention: `camelCase.ts`**
+
+```
+app/stores/
+├── app.ts                        # App-wide state
+├── auth.ts                       # Authentication state
+└── user.ts                       # User state
+```
+
+Rules:
+
+- Store name in `defineStore()` should match the file name.
+- Use Setup Stores syntax (Composition API) over Options Stores.
+
+### Server API Routes (`server/api/`)
+
+**Convention: `kebab-case.method.ts`**
+
+```
+server/api/
+├── hello.get.ts                  # GET  /api/hello
+├── health.get.ts                 # GET  /api/health
+├── users/
+│   ├── index.get.ts              # GET  /api/users
+│   ├── index.post.ts             # POST /api/users
+│   └── [id].get.ts               # GET  /api/users/:id
+│   └── [id].put.ts               # PUT  /api/users/:id
+│   └── [id].delete.ts            # DELETE /api/users/:id
+└── auth/
+    ├── login.post.ts             # POST /api/auth/login
+    └── logout.post.ts            # POST /api/auth/logout
+```
+
+Rules:
+
+- Always suffix with HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`, `.patch.ts`.
+- Use `[param]` for dynamic parameters.
+- Group related endpoints in subdirectories.
+
+### Server Utilities (`server/utils/`)
+
+**Convention: `kebab-case.ts` or `camelCase.ts`**
+
+```
+server/utils/
+├── response.ts                   # Response helpers
+├── validation.ts                 # Validation utilities
+└── auth.ts                       # Auth utilities
+```
+
+### Shared Code (`shared/`)
+
+**Convention: `kebab-case.ts` for files, `kebab-case/` for directories**
+
+```
+shared/
+├── types/
+│   └── index.ts                  # All shared types
+├── constants/
+│   └── index.ts                  # All shared constants
+└── utils/
+    └── index.ts                  # All shared utilities
+```
+
+### Test Files (`test/`)
+
+**Convention: `kebab-case.spec.ts` or `kebab-case.test.ts`**
+
+```
+test/
+├── unit/
+│   ├── composables/
+│   │   └── use-counter.spec.ts
+│   ├── utils/
+│   │   └── format.spec.ts
+│   └── example.spec.ts
+└── e2e/
+    ├── home.spec.ts
+    ├── navigation.spec.ts
+    └── example.spec.ts
 ```
 
 ---
 
-## Vue/Nuxt Standards
+## Component Guidelines
 
-### Component Structure
+### Template Order
+
+Always structure Vue SFC files in this order:
 
 ```vue
 <script setup lang="ts">
-// 1. Define page metadata (if page)
+// Content
+</script>
+
+<template>
+  <!-- Template -->
+</template>
+
+<style scoped>
+/* Styles (prefer Tailwind classes in template) */
+</style>
+```
+
+### Script Setup Structure
+
+Follow this ordering within `<script setup>`:
+
+```vue
+<script setup lang="ts">
+// 1. Page Meta (pages only)
 definePageMeta({
   layout: 'default',
   middleware: ['auth'],
 })
 
-// 2. Props interface (if component)
+// 2. SEO Meta (pages only)
+useSeoMeta({
+  title: 'Page Title',
+  description: 'Page description',
+})
+
+// 3. Type imports
+import type { User } from '~/shared/types'
+
+// 4. Props
 interface Props {
   title: string
   count?: number
@@ -145,114 +365,566 @@ const props = withDefaults(defineProps<Props>(), {
   count: 0,
 })
 
-// 3. Emits interface (if component)
-interface Emits {
-  (e: 'update', value: number): void
-}
-const emit = defineEmits<Emits>()
+// 5. Emits
+const emit = defineEmits<{
+  update: [value: number]
+  close: []
+}>()
 
-// 4. Nuxt composables (auto-imported)
+// 6. Composables (auto-imported)
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
 
-// 5. Data fetching
+// 7. Data fetching
 const { data, pending, error } = await useFetch('/api/users')
 
-// 6. Reactive state
-const localState = ref('')
+// 8. Reactive state
+const isOpen = ref(false)
+const searchQuery = ref('')
 
-// 7. Computed properties
-const computed = computed(() => {})
+// 9. Computed properties
+const filteredItems = computed(() => {
+  // ...
+})
 
-// 8. Methods
-const handleClick = (): void => {}
+// 10. Methods
+const handleSubmit = (): void => {
+  // ...
+}
+
+// 11. Lifecycle hooks
+onMounted(() => {
+  // ...
+})
+
+// 12. Watchers
+watch(searchQuery, (newValue) => {
+  // ...
+})
+</script>
+```
+
+### Component Rules
+
+- Always use `<script setup lang="ts">`.
+- Always use **scoped styles** or Tailwind classes (prefer Tailwind).
+- Define Props and Emits with TypeScript interfaces.
+- Use `withDefaults()` for default prop values.
+- Never import components manually -- they are auto-imported.
+- Component templates should be clean and readable.
+
+---
+
+## Composables Guidelines
+
+```typescript
+// app/composables/useCounter.ts
+
+export function useCounter(initialValue = 0) {
+  // Reactive state
+  const count = ref(initialValue)
+
+  // Computed
+  const isPositive = computed(() => count.value > 0)
+
+  // Methods
+  const increment = (): void => {
+    count.value++
+  }
+
+  const decrement = (): void => {
+    count.value--
+  }
+
+  const reset = (): void => {
+    count.value = initialValue
+  }
+
+  // Return public API
+  return {
+    count: readonly(count),
+    isPositive,
+    increment,
+    decrement,
+    reset,
+  }
+}
+```
+
+Rules:
+
+- Always prefix function name with `use`.
+- Export a named function (not default export).
+- Return reactive refs and methods.
+- Consider returning `readonly()` refs when mutation should only happen through methods.
+- No side effects on import -- side effects should be in `onMounted` or similar.
+
+---
+
+## Page Guidelines
+
+```vue
+<script setup lang="ts">
+// 1. Define page metadata
+definePageMeta({
+  layout: 'default',
+})
+
+// 2. SEO
+useSeoMeta({
+  title: 'About',
+  description: 'Learn more about us',
+})
+
+// 3. Data fetching (SSR)
+const { data: users } = await useFetch('/api/users')
 </script>
 
 <template>
-  <!-- Template -->
+  <div>
+    <h1>About</h1>
+    <!-- Page content -->
+  </div>
+</template>
+```
+
+Rules:
+
+- Always set `useSeoMeta()` for SEO.
+- Use `useFetch()` or `useAsyncData()` for server-side data fetching.
+- Never use `fetch()` or `axios` directly in pages -- use `useFetch()`.
+- Never fetch data in `onMounted()` -- this won't work with SSR.
+
+---
+
+## Layout Guidelines
+
+```vue
+<!-- app/layouts/default.vue -->
+<template>
+  <div>
+    <header>
+      <!-- Navigation -->
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <!-- Footer content -->
+    </footer>
+  </div>
+</template>
+```
+
+Rules:
+
+- Layouts must contain a `<slot />` for page content.
+- Keep layouts minimal -- heavy logic belongs in components.
+- Use `definePageMeta({ layout: 'name' })` in pages to select layout.
+
+---
+
+## Middleware Guidelines
+
+### Route Middleware (Client-side)
+
+```typescript
+// app/middleware/auth.ts
+export default defineNuxtRouteMiddleware((to, _from) => {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated.value) {
+    return navigateTo('/login')
+  }
+})
+```
+
+### Server Middleware
+
+```typescript
+// server/middleware/security-headers.ts
+export default defineEventHandler((event) => {
+  setHeaders(event, {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'SAMEORIGIN',
+  })
+})
+```
+
+Rules:
+
+- Route middleware in `app/middleware/` runs on navigation.
+- Server middleware in `server/middleware/` runs on every server request.
+- Use `defineNuxtRouteMiddleware` for route middleware.
+- Use `defineEventHandler` for server middleware.
+
+---
+
+## Plugin Guidelines
+
+```typescript
+// app/plugins/error-handler.ts
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.config.errorHandler = (error, instance, info) => {
+    // Handle error
+  }
+})
+```
+
+Rules:
+
+- Use `.client.ts` suffix for client-only plugins.
+- Use `.server.ts` suffix for server-only plugins.
+- Use `defineNuxtPlugin` for app plugins.
+- Use `defineNitroPlugin` for server plugins.
+
+---
+
+## Store Guidelines (Pinia)
+
+Use the **Setup Store** syntax (Composition API style):
+
+```typescript
+// app/stores/auth.ts
+import { defineStore } from 'pinia'
+
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const user = ref<User | null>(null)
+  const token = ref<string | null>(null)
+
+  // Getters (computed)
+  const isAuthenticated = computed(() => !!token.value)
+  const userName = computed(() => user.value?.name ?? 'Guest')
+
+  // Actions (functions)
+  async function login(credentials: LoginCredentials): Promise<void> {
+    const response = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: credentials,
+    })
+    user.value = response.user
+    token.value = response.token
+  }
+
+  function logout(): void {
+    user.value = null
+    token.value = null
+    navigateTo('/login')
+  }
+
+  return {
+    user: readonly(user),
+    token: readonly(token),
+    isAuthenticated,
+    userName,
+    login,
+    logout,
+  }
+})
+```
+
+Rules:
+
+- Always use Setup Store syntax.
+- Store name in `defineStore('name')` must match the file name.
+- Export the store function with `use` prefix and `Store` suffix: `useAuthStore`.
+- Return `readonly()` for state that should only be modified via actions.
+- Use `$fetch` (not `useFetch`) inside store actions.
+
+---
+
+## Server API Guidelines
+
+### Route Handlers
+
+```typescript
+// server/api/users/index.get.ts
+export default defineEventHandler(async (event) => {
+  const { page, perPage } = parsePaginationParams(event)
+
+  // Fetch data
+  const users = await getUsers({ page, perPage })
+
+  // Return standardized response
+  return createPaginatedResponse(users.data, {
+    page,
+    perPage,
+    total: users.total,
+  })
+})
+
+// server/api/users/index.post.ts
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  // Validate
+  if (!body.name || !body.email) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Name and email are required',
+    })
+  }
+
+  // Create
+  const user = await createUser(body)
+
+  return createApiResponse(user, 'User created successfully')
+})
+```
+
+Rules:
+
+- Always suffix files with HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`.
+- Always validate input.
+- Use `createError()` for error responses with proper status codes.
+- Use server utility functions (`createApiResponse`, `createPaginatedResponse`) for consistent responses.
+- Use `readBody()` for POST/PUT/PATCH body.
+- Use `getQuery()` for query parameters.
+- Use `getRouterParam()` for route parameters.
+
+---
+
+## Shared Code Guidelines
+
+### Types (`shared/types/`)
+
+```typescript
+// shared/types/index.ts
+
+// API response types
+export interface ApiResponse<T> {
+  success: boolean
+  data: T
+  message?: string
+}
+
+// Domain types
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
+export type UserRole = 'admin' | 'user' | 'guest'
+```
+
+### Constants (`shared/constants/`)
+
+```typescript
+// shared/constants/index.ts
+export const DEFAULT_PAGE = 1
+export const DEFAULT_PER_PAGE = 10
+export const USER_ROLES = ['admin', 'user', 'guest'] as const
+```
+
+### Shared Utilities (`shared/utils/`)
+
+```typescript
+// shared/utils/index.ts
+export function slugify(text: string): string {
+  return text.toLowerCase().replace(/\s+/g, '-')
+}
+```
+
+Rules:
+
+- Only put code here that is needed by **both** `app/` and `server/`.
+- If code is only used on the client, put it in `app/utils/`.
+- If code is only used on the server, put it in `server/utils/`.
+- Code in `shared/` must not use browser APIs or Node.js-specific APIs.
+
+---
+
+## TypeScript Standards
+
+### Strict Mode
+
+TypeScript strict mode is enabled. No exceptions.
+
+```typescript
+// GOOD
+function getUser(id: string): User | null { ... }
+
+// BAD - No 'any' types
+function getUser(id: any): any { ... }
+```
+
+### Naming Conventions
+
+| Type            | Convention  | Example                    |
+| --------------- | ----------- | -------------------------- |
+| Variables       | camelCase   | `const userName = 'John'`  |
+| Constants       | UPPER_SNAKE | `const MAX_RETRIES = 3`    |
+| Functions       | camelCase   | `function getUser() {}`    |
+| Interfaces      | PascalCase  | `interface UserProfile {}` |
+| Types           | PascalCase  | `type UserRole = 'admin'`  |
+| Enums           | PascalCase  | `enum Status { Active }`   |
+| Type Parameters | T, U, K, V  | `function map<T, U>() {}`  |
+
+### Import Order
+
+When explicit imports are needed (rare with Nuxt auto-imports):
+
+```typescript
+// 1. Type imports
+import type { User } from '~/shared/types'
+
+// 2. External packages
+import { z } from 'zod'
+
+// 3. Internal modules
+import { formatDate } from '~/app/utils/format'
+```
+
+---
+
+## Tailwind CSS Standards
+
+### Usage
+
+- Prefer Tailwind utility classes over custom CSS.
+- Use `<style scoped>` only when Tailwind classes are insufficient.
+- Use Tailwind's dark mode variant (`dark:`) for dark mode styles.
+
+```vue
+<!-- GOOD: Tailwind classes -->
+<template>
+  <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Submit</button>
 </template>
 
+<!-- AVOID: Custom CSS for basic styling -->
 <style scoped>
-/* Styles */
+.submit-btn {
+  border-radius: 8px;
+  background-color: #2563eb;
+  padding: 8px 16px;
+  color: white;
+}
 </style>
 ```
 
-### Data Fetching Guidelines
+### Class Ordering
+
+Follow this approximate order for Tailwind classes:
+
+1. Layout: `flex`, `grid`, `block`, `inline`
+2. Sizing: `w-`, `h-`, `min-w-`, `max-w-`
+3. Spacing: `p-`, `m-`, `gap-`
+4. Typography: `text-`, `font-`, `leading-`
+5. Backgrounds: `bg-`
+6. Borders: `border-`, `rounded-`
+7. Effects: `shadow-`, `opacity-`
+8. Transitions: `transition-`, `duration-`
+9. Responsive: `sm:`, `md:`, `lg:`
+10. State: `hover:`, `focus:`, `active:`
+11. Dark mode: `dark:`
+
+---
+
+## SSR Compatibility
+
+### Rules
+
+All code must work on both server and client unless explicitly marked.
+
+```typescript
+// GOOD: Check environment
+if (import.meta.client) {
+  localStorage.setItem('theme', 'dark')
+}
+
+// GOOD: Use ClientOnly wrapper
+<ClientOnly>
+  <BrowserOnlyComponent />
+</ClientOnly>
+
+// BAD: Direct browser API usage (breaks SSR)
+localStorage.setItem('theme', 'dark')
+window.addEventListener('scroll', handler)
+```
+
+### Common Patterns
+
+```typescript
+// Use useState for hydration-safe shared state
+const theme = useState('theme', () => 'light')
+
+// Use useCookie for cookie access (works on both server/client)
+const token = useCookie('auth_token')
+
+// Use useHead/useSeoMeta for head management
+useHead({ title: 'My Page' })
+```
+
+---
+
+## Data Fetching
+
+### In Pages/Components
 
 ```vue
-<!-- ✅ GOOD: Use useFetch for API calls in pages -->
 <script setup lang="ts">
-// For API calls
-const {
-  data: users,
-  pending,
-  error,
-  refresh,
-} = await useFetch('/api/users', {
-  // Unique key for caching
-  key: 'users',
-  // Watch for changes
-  watch: [() => route.query],
-  // Transform response
-  transform: (data: User[]) => data.filter((u) => u.active),
-})
+// SSR data fetching -- await blocks navigation until data is ready
+const { data, pending, error } = await useFetch('/api/users')
 
-// For any async operation
-const { data: time } = await useAsyncData('time', () => $fetch('/api/time'), {
-  // Cache for 60 seconds
-  getCachedData: (key) => useNuxtData(key).data,
+// Lazy fetch -- does not block navigation
+const { data, pending } = useLazyFetch('/api/products')
+
+// With options
+const { data } = await useFetch('/api/users', {
+  key: 'users-list',
+  query: { page: 1 },
+  transform: (data) => data.map(transformUser),
 })
 </script>
 ```
 
-### Server-Side Rendering Considerations
+### In Stores/Functions
+
+```typescript
+// Use $fetch (not useFetch) outside of setup context
+const data = await $fetch('/api/users')
+```
+
+### Rules
+
+- Use `useFetch()` or `useAsyncData()` in pages and components.
+- Use `$fetch()` in stores, event handlers, and non-setup contexts.
+- Never use `fetch()` or `axios` directly.
+- Always provide a `key` for cacheable requests.
+- Use `useLazyFetch()` when the data is not needed for initial render.
+
+---
+
+## Error Handling
+
+### Client-Side
 
 ```vue
-<!-- ✅ GOOD: Handle client-only code properly -->
 <script setup lang="ts">
-// Check environment
-const isClient = process.client
-const isServer = process.server
-
-// ClientOnly for browser-only APIs
+const { data, error } = await useFetch('/api/users')
 </script>
 
 <template>
-  <!-- Wrap browser-only components -->
-  <ClientOnly>
-    <MapComponent />
-  </ClientOnly>
+  <div v-if="error">Error: {{ error.message }}</div>
+  <div v-else>
+    {{ data }}
+  </div>
 </template>
 ```
 
-### API Routes Structure
+### Server-Side
 
 ```typescript
-// ✅ GOOD: Define API endpoints in server/api/
-// server/api/users/index.get.ts
-
-export default defineEventHandler(async (event) => {
-  // Get query parameters
-  const query = getQuery(event)
-
-  // Get headers
-  const headers = getHeaders(event)
-
-  // Return response
-  return {
-    users: [],
-    timestamp: Date.now(),
-  }
-})
-
 // server/api/users/[id].get.ts
-
 export default defineEventHandler(async (event) => {
-  // Get route parameters
   const id = getRouterParam(event, 'id')
 
-  // Validate
   if (!id) {
     throw createError({
       statusCode: 400,
@@ -260,8 +932,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Fetch and return user
-  const user = await fetchUser(id)
+  const user = await findUser(id)
 
   if (!user) {
     throw createError({
@@ -272,350 +943,58 @@ export default defineEventHandler(async (event) => {
 
   return user
 })
-
-// server/api/users/index.post.ts
-
-export default defineEventHandler(async (event) => {
-  // Read request body
-  const body = await readBody(event)
-
-  // Validate body
-  if (!body.name || !body.email) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Name and email are required',
-    })
-  }
-
-  // Create user
-  const user = await createUser(body)
-
-  // Return created resource
-  return user
-})
 ```
 
-### Shared Code Pattern
+### Global Error Page
 
-```typescript
-// ✅ GOOD: Use shared/ for code used by app and server
-// shared/types/user.ts
-
-export interface User {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-export type UserRole = 'admin' | 'user' | 'guest'
-
-// shared/constants.ts
-
-export const API_BASE_URL = '/api'
-export const USER_ROLES = ['admin', 'user', 'guest'] as const
-
-export type UserRole = (typeof USER_ROLES)[number]
-
-// Can be imported anywhere
-// import type { User } from '~/shared/types/user'
-// import { API_BASE_URL } from '~/shared/constants'
-```
-
-### Middleware Usage
-
-```typescript
-// ✅ GOOD: Named route middleware for auth
-// app/middleware/auth.ts
-
-export default defineNuxtRouteMiddleware((to, from) => {
-  const { isAuthenticated } = useAuth()
-
-  if (!isAuthenticated.value) {
-    return navigateTo('/login')
-  }
-})
-
-// Use in page
-<script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
-</script>
-
-// ✅ GOOD: Anonymous middleware
-definePageMeta({
-  middleware: (to, from) => {
-    const { hasPermission } = usePermissions()
-    if (!hasPermission('admin')) {
-      return navigateTo('/')
-    }
-  }
-})
-```
-
-### Plugin Usage
-
-```typescript
-// ✅ GOOD: Vue plugins in app/plugins/
-// app/plugins/vue-tooltip.ts
-
-export default defineNuxtPlugin((nuxtApp) => {
-  // Plugin logic
-  nuxtApp.provide('tooltip', (message: string) => {
-    console.log('Tooltip:', message)
-  })
-})
-
-// ✅ GOOD: Server plugins in server/plugins/
-// server/plugins/database.ts
-
-export default defineNitroPlugin((nitroApp) => {
-  console.log('Database connected')
-
-  nitroApp.hooks.hook('request', async (event) => {
-    // Run on every request
-  })
-})
-```
-
-### Layouts Pattern
-
-```vue
-<!-- ✅ GOOD: Create reusable layouts -->
-<!-- app/layouts/default.vue -->
-
-<template>
-  <div class="layout">
-    <header>
-      <nav>
-        <NuxtLink to="/">Home</NuxtLink>
-        <NuxtLink to="/about">About</NuxtLink>
-      </nav>
-    </header>
-
-    <main>
-      <slot />
-      <!-- Page content -->
-    </main>
-
-    <footer>
-      <p>&copy; {{ new Date().getFullYear() }}</p>
-    </footer>
-  </div>
-</template>
-
-<!-- Use in page -->
-<script setup lang="ts">
-definePageMeta({
-  layout: 'default',
-})
-</script>
-```
-
-### Error Handling
-
-```vue
-<!-- ✅ GOOD: Custom error page -->
-<!-- app/error.vue -->
-
-<template>
-  <div class="error">
-    <h1>{{ error.statusCode }}</h1>
-    <p>{{ error.statusMessage }}</p>
-    <button @click="handleError">Go Home</button>
-  </div>
-</template>
-
-<script setup lang="ts">
-interface Props {
-  error: {
-    statusCode: number
-    statusMessage: string
-  }
-}
-
-const props = defineProps<Props>()
-
-const handleError = () => {
-  clearError({ redirect: '/' })
-}
-</script>
-```
-
----
-
-## TypeScript Standards
-
-### Strict Mode Rules
-
-We use TypeScript strict mode. No exceptions.
-
-```typescript
-// ✅ GOOD: Explicit types
-function calculateTotal(prices: number[]): number {
-  return prices.reduce((sum, price) => sum + price, 0)
-}
-
-// ❌ BAD: Any type
-function calculateTotal(prices: any): any {
-  // Wrong!
-  return prices.reduce((sum: any, price: any) => sum + price, 0)
-}
-```
-
-### Type Definitions
-
-```typescript
-// ✅ GOOD: Define shared types in shared/types/
-// shared/types/user.ts
-
-export interface User {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-export type UserRole = 'admin' | 'user' | 'guest'
-
-export interface CreateUserDto {
-  name: string
-  email: string
-  password: string
-}
-
-export interface UpdateUserDto {
-  name?: string
-  email?: string
-}
-
-// Import anywhere
-// import type { User, CreateUserDto } from '~/shared/types/user'
-```
-
-### Auto-Imported Types
-
-```typescript
-// ✅ GOOD: Types in composables are auto-imported
-// app/composables/useUser.ts
-
-export interface User {
-  id: string
-  name: string
-}
-
-export const useUser = () => {
-  const user = ref<User | null>(null)
-  return { user }
-}
-
-// Type is auto-imported - no import needed!
-// const user: User | null = null
-```
-
-### Runtime Config
-
-```typescript
-// ✅ GOOD: Use runtime config for environment variables
-// nuxt.config.ts
-export default defineNuxtConfig({
-  runtimeConfig: {
-    // Server-side only
-    apiSecret: process.env.API_SECRET,
-
-    // Public (exposed to client)
-    public: {
-      apiBase: process.env.API_BASE_URL || '/api',
-    },
-  },
-})
-
-// Use in app
-const config = useRuntimeConfig()
-const apiBase = config.public.apiBase // Available on client and server
-const apiSecret = config.apiSecret // Server-only
-```
+The `app/error.vue` file handles all unhandled errors. Use `clearError()` to recover.
 
 ---
 
 ## Testing Standards
 
-### Component Testing
+### Unit Tests (Vitest)
 
 ```typescript
-// ✅ GOOD: Test components with @nuxt/test-utils
 import { describe, it, expect } from 'vitest'
-import { mountSuspended } from '@nuxt/test-utils/runtime'
-import Counter from '~/components/Counter.vue'
+import { useCounter } from '~/app/composables/useCounter'
 
-describe('Counter', () => {
-  it('increments count', async () => {
-    const component = await mountSuspended(Counter)
+describe('useCounter', () => {
+  it('starts with initial value', () => {
+    const { count } = useCounter(5)
+    expect(count.value).toBe(5)
+  })
 
-    expect(component.text()).toContain('Count: 0')
-
-    await component.find('button').trigger('click')
-
-    expect(component.text()).toContain('Count: 1')
+  it('increments count', () => {
+    const { count, increment } = useCounter()
+    increment()
+    expect(count.value).toBe(1)
   })
 })
 ```
 
-### API Testing
+### E2E Tests (Playwright)
 
 ```typescript
-// ✅ GOOD: Test API endpoints
-import { describe, it, expect } from 'vitest'
-import { $fetch, setup } from '@nuxt/test-utils/e2e'
-
-await setup({
-  server: true,
-})
-
-describe('API Endpoints', () => {
-  it('GET /api/users returns users', async () => {
-    const users = await $fetch('/api/users')
-
-    expect(users).toBeDefined()
-    expect(Array.isArray(users)).toBe(true)
-  })
-
-  it('GET /api/users/:id returns user', async () => {
-    const user = await $fetch('/api/users/123')
-
-    expect(user).toBeDefined()
-    expect(user.id).toBe('123')
-  })
-})
-```
-
-### Test Coverage Requirements
-
-- **Overall coverage**: 80% minimum
-- **Critical paths**: 100% required
-- **API endpoints**: 90% minimum
-- **Components**: 75% minimum
-
-### E2E Testing
-
-```typescript
-// ✅ GOOD: Test critical user flows
 import { test, expect } from '@playwright/test'
 
-test.describe('Authentication Flow', () => {
-  test('user can log in', async ({ page }) => {
-    await page.goto('/login')
-
-    await page.fill('input[name="email"]', 'user@example.com')
-    await page.fill('input[name="password"]', 'password123')
-    await page.click('button[type="submit"]')
-
-    await expect(page).toHaveURL('/dashboard')
-    await expect(page.locator('h1')).toContainText('Welcome')
-  })
+test('home page loads', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('h1')).toBeVisible()
 })
 ```
+
+### Test File Naming
+
+- Unit: `test/unit/**/*.spec.ts` or `test/unit/**/*.test.ts`
+- E2E: `test/e2e/**/*.spec.ts`
+
+### Coverage Requirements
+
+- Overall: 80% minimum
+- Critical paths (auth, payments): 100%
+- API endpoints: 90%
+- Components: 75%
 
 ---
 
@@ -624,21 +1003,12 @@ test.describe('Authentication Flow', () => {
 ### Branch Naming
 
 ```
-feature/  New features
-  feature/user-authentication
-  feature/payment-integration
-
-fix/      Bug fixes
-  fix/login-error
-  fix/navigation-bug
-
-refactor/ Code refactoring
-  refactor/user-service
-  refactor-api-structure
-
-hotfix/   Urgent production fixes
-  hotfix/security-patch
-  hotfix/critical-bug
+feature/user-authentication       # New features
+fix/login-error                   # Bug fixes
+refactor/api-structure            # Code refactoring
+hotfix/security-patch             # Urgent production fixes
+docs/update-readme                # Documentation
+chore/update-deps                 # Dependency updates
 ```
 
 ### Commit Messages
@@ -646,140 +1016,71 @@ hotfix/   Urgent production fixes
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-<type>: <description>
-
-[optional body]
-
-[optional footer]
-```
-
-**Types**: feat, fix, refactor, docs, test, chore, perf, ci
-
-```
 feat: add user authentication flow
-
-- Implement login/logout endpoints
-- Add protected route middleware
-- Create auth composable
-
-Closes #123
+fix: resolve login redirect loop
+refactor: simplify API response format
+docs: update RULES.md with store guidelines
+test: add unit tests for useCounter
+chore: upgrade Nuxt to v4.2
+perf: lazy load dashboard charts
+ci: add type-check step to CI pipeline
 ```
 
-### Pull Request Guidelines
+### Before Committing
 
-1. **Title**: Use conventional commit format
-2. **Description**: Explain what and why
-3. **Linked Issues**: Reference related tickets
-4. **Checks**: All CI checks must pass
-5. **Review**: Minimum 1 approval required
+Always run:
+
+```bash
+pnpm run lint:fix     # Fix lint errors
+pnpm run format       # Format code
+pnpm run type-check   # Verify types
+pnpm run test:run     # Run unit tests
+```
 
 ---
 
 ## Performance Guidelines
 
-### Caching with Route Rules
+### Lazy Loading Components
+
+```vue
+<script setup lang="ts">
+// Lazy load heavy components
+const Chart = defineAsyncComponent(() => import('~/app/components/features/Chart.vue'))
+</script>
+```
+
+### Image Optimization
+
+```vue
+<!-- Use NuxtImg for optimized images -->
+<NuxtImg src="/images/hero.jpg" width="800" height="600" loading="lazy" format="webp" />
+```
+
+### Route Rules (Caching)
 
 ```typescript
-// ✅ GOOD: Configure caching in nuxt.config.ts
+// nuxt.config.ts
 export default defineNuxtConfig({
   routeRules: {
-    // Static page - ISR every hour
-    '/': { isr: 3600 },
-    // API endpoint - ISR every minute
-    '/api/products': { isr: 60 },
-    // Dynamic page - no caching
-    '/admin/**': { isr: false },
-    // Static assets - cache for 1 year
-    '/images/**': { isr: 31536000 },
+    '/': { isr: 3600 }, // ISR: revalidate every hour
+    '/api/products': { isr: 60 }, // ISR: revalidate every minute
+    '/admin/**': { ssr: true }, // Always SSR
+    '/static/**': { prerender: true }, // Pre-render at build time
   },
 })
 ```
 
-### Lazy Loading
-
-```vue
-<!-- ✅ GOOD: Lazy load heavy components -->
-<script setup lang="ts">
-const HeavyChart = defineAsyncComponent(() => import('~/components/features/HeavyChart.vue'))
-</script>
-
-<template>
-  <HeavyChart v-if="showChart" />
-</template>
-```
-
-### Data Fetching Best Practices
-
-```typescript
-// ✅ GOOD: Use appropriate data fetching composable
-// useFetch - for API calls
-const { data } = await useFetch('/api/users')
-
-// useAsyncData - for any async operation
-const { data } = await useAsyncData('time', () => $fetch('/api/time'))
-
-// useLazyFetch - don't block navigation
-const { data, pending } = useLazyFetch('/api/products')
-```
-
 ---
 
-## Security Best Practices
+## Security Guidelines
 
-### Input Validation
-
-```typescript
-// ✅ GOOD: Validate input in API routes
-export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-
-  // Validate required fields
-  if (!body.email || !body.password) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Email and password are required',
-    })
-  }
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(body.email)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Invalid email format',
-    })
-  }
-
-  // Process request
-  return { success: true }
-})
-```
-
-### XSS Prevention
-
-```vue
-<!-- ❌ BAD: Unescaped HTML (XSS risk) -->
-<div v-html="userContent" />
-
-<!-- ✅ GOOD: Use text interpolation -->
-<div>{{ userContent }}</div>
-
-<!-- ✅ GOOD: Sanitize if HTML is necessary -->
-<div v-html="DOMPurify.sanitize(userContent)" />
-```
-
-### Environment Variables
-
-```typescript
-// ✅ GOOD: Use runtime config
-const config = useRuntimeConfig()
-
-// Server-only secrets
-const dbUrl = config.dbUrl
-
-// Public config (client and server)
-const apiBase = config.public.apiBase
-```
+- Never commit secrets or API keys -- use `.env` and `runtimeConfig`.
+- Always validate user input on the server side.
+- Use `createError()` for error responses (prevents leaking internal details).
+- Apply security headers via server middleware.
+- Sanitize HTML if using `v-html` (use DOMPurify).
+- Use `readonly()` for refs that should not be mutated externally.
 
 ---
 
@@ -788,54 +1089,34 @@ const apiBase = config.public.apiBase
 ### Essential Commands
 
 ```bash
-# Development
 pnpm dev              # Start dev server
 pnpm build            # Build for production
-pnpm generate         # Generate static site
 pnpm preview          # Preview production build
-
-# Code Quality
-pnpm run lint         # Run ESLint
-pnpm run lint:fix     # Fix ESLint errors
-pnpm run format       # Format with Prettier
-pnpm run type-check   # TypeScript type check
-
-# Testing
-pnpm run test         # Run unit tests
+pnpm run lint         # Run linter
+pnpm run lint:fix     # Auto-fix lint errors
+pnpm run format       # Format code
+pnpm run type-check   # TypeScript check
+pnpm run test         # Run unit tests (watch mode)
+pnpm run test:run     # Run unit tests (single run)
 pnpm run test:e2e     # Run E2E tests
 ```
 
-### Nuxt Auto-Imports
-
-No imports needed for:
+### Auto-Imported APIs (No import needed)
 
 ```typescript
-// Vue composables
-ref, computed, watch, onMounted, etc.
+// Vue
+ref, reactive, computed, watch, watchEffect,
+onMounted, onUnmounted, nextTick, provide, inject,
+defineProps, defineEmits, withDefaults
 
-// Nuxt composables
-useRoute, useRouter, useFetch, useAsyncData,
-useRuntimeConfig, useState, useCookie, useHead, etc.
+// Nuxt
+useRoute, useRouter, useFetch, useAsyncData, useLazyFetch,
+useRuntimeConfig, useState, useCookie, useHead, useSeoMeta,
+useNuxtApp, useAppConfig, useError, clearError,
+navigateTo, createError, definePageMeta,
+defineNuxtRouteMiddleware
 
-// Vue components
-All components in app/components/ are auto-imported
+// VueUse (via @vueuse/nuxt)
+useLocalStorage, useSessionStorage, useDark, useToggle,
+useClipboard, useMediaQuery, useWindowSize, etc.
 ```
-
----
-
-## References & External Resources
-
-Official Documentation:
-
-- [Nuxt 4 Documentation](https://nuxt.com/docs) - Core Nuxt concepts
-- [Nuxt 4 Migration Guide](https://nuxt.com/docs/getting-started/upgrading) - Upgrading to Nuxt 4
-- [Nitro Documentation](https://nitro.unjs.io/) - Server engine
-- [Vue 3 Guide](https://vuejs.org/guide/introduction.html) - Vue fundamentals
-- [Vue Router](https://router.vuejs.org/) - Routing (for reference)
-- [Pinia](https://pinia.vuejs.org/) - State management
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/) - TypeScript fundamentals
-- [Vitest](https://vitest.dev/) - Unit testing framework
-- [Playwright](https://playwright.dev/) - E2E testing framework
-- [VueUse](https://vueuse.org/) - Vue composition utilities
-
-For detailed AI-specific guidelines, see [CLAUDE.md](./CLAUDE.md).

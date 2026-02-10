@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { useCounter } from '~/app/composables/useCounter'
+import { ref } from 'vue'
+
+// Import composable using the alias
+import { useCounter } from '~/composables/useCounter'
+
+// Mock Vue's ref for testing outside Nuxt context
+vi.stubGlobal('ref', ref)
 
 describe('useCounter', () => {
   it('starts with initial value', () => {

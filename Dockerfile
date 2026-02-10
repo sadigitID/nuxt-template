@@ -4,7 +4,7 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm@9
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
@@ -23,17 +23,8 @@ FROM node:22-alpine AS production
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm@9
-
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
-
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
-
-# Copy built files from builder
-COPY --from=builder /app/.output ./
+# Copy built output (Nuxt outputs a standalone server)
+COPY --from=builder /app/.output ./.output
 
 # Set environment
 ENV NODE_ENV=production
@@ -44,4 +35,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Start server
-CMD ['node', 'server/index.mjs']
+CMD ["node", ".output/server/index.mjs"]

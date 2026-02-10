@@ -1,5 +1,8 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// https://nuxt.com/docs/api/configuration/app-config
 export default defineAppConfig({
-  title: 'Nuxt 4 App',
-  description: 'A Nuxt 4 template with best practices',
+  // Application metadata (accessible via useAppConfig())
+  ui: {
+    primaryColor: 'blue',
+    grayColor: 'neutral',
+  },
 })

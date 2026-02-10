@@ -18,12 +18,14 @@ This document provides AI-specific guidelines for reviewing and contributing to 
 
 ```
 app/              # Main application code (NEW in Nuxt 4)
+├── assets/       # Static assets (processed by bundler)
 ├── components/   # Auto-imported components
 ├── composables/  # Auto-imported composition functions
 ├── layouts/      # Layout wrappers
 ├── middleware/   # Route middleware
 ├── pages/        # File-based routing
 ├── plugins/      # Vue plugins
+├── stores/       # Pinia stores
 └── utils/        # Client utilities
 
 server/           # Server-side code (Nitro)
