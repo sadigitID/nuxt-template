@@ -34,8 +34,8 @@ A production-ready Nuxt 4 template with TypeScript, Tailwind CSS, SEO, and best 
 ### Setup
 
 ```bash
-# Clone the template
-git clone <repository-url> my-project
+# Create a new project from this template
+npx nuxi@latest init -t github:sadigitid/nuxt-template my-project
 cd my-project
 
 # Install dependencies
