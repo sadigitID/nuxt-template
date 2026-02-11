@@ -1,33 +1,33 @@
 # Nuxt 4 Template
 
-A production-ready Nuxt 4 template with TypeScript, Tailwind CSS, SEO, and best practices configured out of the box.
+[Nuxt](https://nuxt.com/) adalah framework full-stack berbasis Vue 3 yang mendukung **Server-Side Rendering (SSR)**, **Static Site Generation (SSG)**, dan **Client-Side Rendering (CSR)** dalam satu project. Template ini menyediakan konfigurasi Nuxt 4 siap pakai dengan TypeScript, Tailwind CSS, SEO, testing, dan best practice yang sudah di-setup sejak awal — tinggal clone dan mulai coding.
 
-## Features
+## Fitur
 
-| Feature        | Package                     | Description                                     |
-| -------------- | --------------------------- | ----------------------------------------------- |
-| **Framework**  | `nuxt` v4                   | Nuxt 4 with `app/` directory structure          |
-| **Language**   | `typescript`                | Strict mode enabled                             |
-| **Styling**    | `@nuxtjs/tailwindcss`       | Utility-first CSS framework                     |
-| **Icons**      | `@nuxt/icon`                | 200k+ icons via Iconify (Lucide, Simple Icons)  |
-| **Images**     | `@nuxt/image`               | Automatic image optimization (avif, webp)       |
-| **Fonts**      | `@nuxt/fonts`               | Automatic font optimization                     |
-| **SEO**        | `@nuxtjs/seo`               | Sitemap, robots, OG image, schema.org           |
-| **Color Mode** | `@nuxtjs/color-mode`        | Dark/light mode with system preference          |
-| **State**      | `@pinia/nuxt`               | Pinia stores with auto-import                   |
-| **Utilities**  | `@vueuse/nuxt`              | 200+ Vue composition utilities                  |
-| **Validation** | `zod`                       | Runtime type validation                         |
-| **Dates**      | `date-fns`                  | Date utility library                            |
-| **Linting**    | `@nuxt/eslint` + `prettier` | ESLint 9 + Prettier 3                           |
-| **Git Hooks**  | `husky` + `lint-staged`     | Pre-commit lint & format, commit msg validation |
-| **Unit Tests** | `vitest`                    | Fast unit testing                               |
-| **E2E Tests**  | `@playwright/test`          | Cross-browser E2E testing                       |
-| **CI/CD**      | GitHub Actions              | Lint, type-check, test, build                   |
-| **Docker**     | Dockerfile + Compose        | Production containerization                     |
+| Fitur          | Package                     | Deskripsi                                     |
+| -------------- | --------------------------- | --------------------------------------------- |
+| **Framework**  | `nuxt` v4                   | Nuxt 4 dengan struktur direktori `app/`       |
+| **Bahasa**     | `typescript`                | Strict mode aktif                             |
+| **Styling**    | `@nuxtjs/tailwindcss`       | Utility-first CSS framework                   |
+| **Icons**      | `@nuxt/icon`                | 200k+ ikon via Iconify (Lucide, Simple Icons) |
+| **Images**     | `@nuxt/image`               | Optimasi gambar otomatis (avif, webp)         |
+| **Fonts**      | `@nuxt/fonts`               | Optimasi font otomatis                        |
+| **SEO**        | `@nuxtjs/seo`               | Sitemap, robots, OG image, schema.org         |
+| **Color Mode** | `@nuxtjs/color-mode`        | Dark/light mode dengan deteksi system         |
+| **State**      | `@pinia/nuxt`               | Pinia stores dengan auto-import               |
+| **Utilities**  | `@vueuse/nuxt`              | 200+ Vue composition utilities                |
+| **Validasi**   | `zod`                       | Validasi tipe data saat runtime               |
+| **Tanggal**    | `date-fns`                  | Library utilitas tanggal                      |
+| **Linting**    | `@nuxt/eslint` + `prettier` | ESLint 9 + Prettier 3                         |
+| **Git Hooks**  | `husky` + `lint-staged`     | Pre-commit lint & format, validasi commit msg |
+| **Unit Tests** | `vitest`                    | Unit testing cepat                            |
+| **E2E Tests**  | `@playwright/test`          | Cross-browser E2E testing                     |
+| **CI/CD**      | GitHub Actions              | Lint, type-check, test, build                 |
+| **Docker**     | Dockerfile + Compose        | Containerisasi untuk production               |
 
 ## Quick Start
 
-### Prerequisites
+### Prasyarat
 
 - [Node.js](https://nodejs.org/) v22+
 - [pnpm](https://pnpm.io/) v9+
@@ -35,9 +35,9 @@ A production-ready Nuxt 4 template with TypeScript, Tailwind CSS, SEO, and best 
 ### Setup
 
 ```bash
-# Create a new project from this template
-npx nuxi@latest init -t github:sadigitid/nuxt-template my-project
-cd my-project
+# Buat project baru dari template ini
+npx nuxi@latest init -t github:sadigitid/nuxt-template nama-project
+cd nama-project
 
 # Install dependencies
 pnpm install
@@ -45,136 +45,166 @@ pnpm install
 # Copy environment variables
 cp .env.example .env
 
-# Start development server
+# Jalankan development server
 pnpm dev
 ```
 
-The development server starts at `http://localhost:3000`.
+Development server berjalan di `http://localhost:3000`.
 
-## Project Structure
+> **Apa itu `nuxi`?** `nuxi` adalah CLI resmi dari Nuxt. Perintah `npx nuxi@latest init -t github:sadigitid/nuxt-template` akan men-download template ini dari GitHub dan membuat project baru tanpa history Git — langsung siap dipakai.
+
+> **Apa itu `pnpm`?** `pnpm` adalah package manager alternatif yang lebih cepat dan hemat disk dibanding `npm`. Install via `npm install -g pnpm` atau lihat [dokumentasi pnpm](https://pnpm.io/installation).
+
+## Coba Dulu
+
+Setelah menjalankan `pnpm dev`, ikuti langkah-langkah berikut untuk memastikan semuanya berjalan:
+
+### 1. Buka Browser
+
+Buka [http://localhost:3000](http://localhost:3000) — kamu akan melihat halaman utama template.
+
+### 2. Cek Halaman About
+
+Buka [http://localhost:3000/about](http://localhost:3000/about) — ini membuktikan file-based routing sudah bekerja. Setiap file `.vue` di folder `app/pages/` otomatis menjadi route.
+
+### 3. Coba API Endpoint
+
+Buka tab baru di browser atau jalankan:
+
+```bash
+curl http://localhost:3000/api/hello
+```
+
+Kamu akan mendapat response JSON dari server. File API di `server/api/` otomatis menjadi endpoint — tanpa perlu konfigurasi routing manual.
+
+### 4. Coba Dark Mode
+
+Jika template menyertakan toggle dark mode, klik tombolnya. Mode gelap/terang menggunakan `@nuxtjs/color-mode` yang otomatis mendeteksi preferensi sistem.
+
+## Struktur Project
 
 ```
 nuxt-template/
-├── app/                          # Application code (Nuxt 4)
-│   ├── assets/css/               # Global CSS (Tailwind entry point)
-│   ├── components/               # Auto-imported Vue components
-│   │   ├── common/               #   Reusable UI components
-│   │   └── features/             #   Feature-specific components
-│   ├── composables/              # Auto-imported composition functions
+├── app/                          # Kode aplikasi (Nuxt 4)
+│   ├── assets/css/               # Global CSS (entry point Tailwind)
+│   ├── components/               # Komponen Vue (auto-import)
+│   │   ├── common/               #   Komponen reusable (Button, Modal, dll)
+│   │   └── features/             #   Komponen spesifik fitur
+│   ├── composables/              # Composition functions (auto-import)
 │   ├── layouts/                  # Layout wrappers
 │   ├── middleware/               # Route middleware
 │   ├── pages/                    # File-based routing
 │   ├── plugins/                  # Vue plugins
 │   ├── stores/                   # Pinia stores
-│   └── utils/                    # Client utilities
+│   └── utils/                    # Utilitas client
 │
-├── server/                       # Server-side code (Nitro)
+├── server/                       # Kode server-side (Nitro)
 │   ├── api/                      # API endpoints
 │   ├── middleware/                # Server middleware
 │   ├── plugins/                  # Server plugins
 │   ├── routes/                   # Server routes
-│   └── utils/                    # Server utilities
+│   └── utils/                    # Utilitas server
 │
-├── shared/                       # Shared between app and server
-│   ├── constants/                # Shared constants
-│   ├── types/                    # Shared TypeScript types
-│   └── utils/                    # Shared utility functions
+├── shared/                       # Dipakai bersama oleh app dan server
+│   ├── constants/                # Konstanta
+│   ├── types/                    # TypeScript types
+│   └── utils/                    # Utility functions
 │
-├── public/                       # Static files (served as-is)
-├── test/                         # Test files
+├── public/                       # File statis (disajikan apa adanya)
+├── test/                         # File test
 │   ├── unit/                     # Vitest unit tests
 │   └── e2e/                      # Playwright E2E tests
 │
-├── nuxt.config.ts                # Nuxt configuration
-├── app.config.ts                 # Runtime app configuration
-├── tsconfig.json                 # TypeScript configuration
-├── eslint.config.mjs             # ESLint configuration
-├── .prettierrc.json              # Prettier configuration
-├── vitest.config.ts              # Vitest configuration
-├── playwright.config.ts          # Playwright configuration
-├── commitlint.config.mjs         # Commitlint configuration
+├── nuxt.config.ts                # Konfigurasi Nuxt
+├── app.config.ts                 # Konfigurasi app (runtime)
+├── tsconfig.json                 # Konfigurasi TypeScript
+├── eslint.config.mjs             # Konfigurasi ESLint
+├── .prettierrc.json              # Konfigurasi Prettier
+├── vitest.config.ts              # Konfigurasi Vitest
+├── playwright.config.ts          # Konfigurasi Playwright
+├── commitlint.config.mjs         # Konfigurasi Commitlint
 ├── Dockerfile                    # Docker build
 └── docker-compose.yml            # Docker Compose
 ```
 
 ## Scripts
 
-| Command                 | Description                       |
-| ----------------------- | --------------------------------- |
-| `pnpm dev`              | Start development server with HMR |
-| `pnpm build`            | Build for production              |
-| `pnpm generate`         | Generate static site              |
-| `pnpm preview`          | Preview production build          |
-| `pnpm run lint`         | Run ESLint                        |
-| `pnpm run lint:fix`     | Auto-fix lint errors              |
-| `pnpm run format`       | Format code with Prettier         |
-| `pnpm run format:check` | Check formatting without writing  |
-| `pnpm run type-check`   | Run TypeScript type checker       |
-| `pnpm run test`         | Run unit tests in watch mode      |
-| `pnpm run test:run`     | Run unit tests once               |
-| `pnpm run test:e2e`     | Run Playwright E2E tests          |
-| `pnpm run test:e2e:ui`  | Open Playwright UI                |
+| Perintah                | Deskripsi                              |
+| ----------------------- | -------------------------------------- |
+| `pnpm dev`              | Jalankan development server dengan HMR |
+| `pnpm build`            | Build untuk production                 |
+| `pnpm generate`         | Generate static site                   |
+| `pnpm preview`          | Preview hasil build production         |
+| `pnpm run lint`         | Jalankan ESLint                        |
+| `pnpm run lint:fix`     | Auto-fix error lint                    |
+| `pnpm run format`       | Format kode dengan Prettier            |
+| `pnpm run format:check` | Cek formatting tanpa mengubah file     |
+| `pnpm run type-check`   | Jalankan TypeScript type checker       |
+| `pnpm run test`         | Jalankan unit tests (watch mode)       |
+| `pnpm run test:run`     | Jalankan unit tests sekali             |
+| `pnpm run test:e2e`     | Jalankan Playwright E2E tests          |
+| `pnpm run test:e2e:ui`  | Buka Playwright UI                     |
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and configure:
+Copy `.env.example` ke `.env` lalu sesuaikan:
 
 ```bash
-# Application
-NUXT_PUBLIC_APP_NAME=My App           # Public app name
-NUXT_PUBLIC_APP_URL=http://localhost:3000  # Public app URL
+# Aplikasi
+NUXT_PUBLIC_APP_NAME=My App           # Nama app (publik)
+NUXT_PUBLIC_APP_URL=http://localhost:3000  # URL app (publik)
 
 # API
-NUXT_PUBLIC_API_BASE_URL=/api         # Public API base URL
-NUXT_API_SECRET=secret                # Server-only API secret
+NUXT_PUBLIC_API_BASE_URL=/api         # Base URL API (publik)
+NUXT_API_SECRET=secret                # Secret API (hanya server)
 
 # Session
-NUXT_SESSION_SECRET=secret            # Server-only session secret
+NUXT_SESSION_SECRET=secret            # Secret session (hanya server)
 ```
 
-Environment variables prefixed with `NUXT_PUBLIC_` are exposed to the client via `useRuntimeConfig().public`. Variables without the prefix are server-only and accessed via `useRuntimeConfig()`.
+Environment variable dengan prefix `NUXT_PUBLIC_` bisa diakses di client via `useRuntimeConfig().public`. Variable tanpa prefix hanya bisa diakses di server via `useRuntimeConfig()`.
 
-## Modules Included
+## Modul yang Disertakan
 
 ### @nuxtjs/tailwindcss
 
-Tailwind CSS is pre-configured. Use utility classes directly in templates:
+Tailwind CSS sudah dikonfigurasi. Gunakan utility class langsung di template:
 
 ```vue
 <template>
-  <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Click me</button>
+  <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Klik saya</button>
 </template>
 ```
 
 ### @nuxtjs/seo
 
-SEO is handled automatically. Set per-page metadata:
+SEO ditangani otomatis. Atur metadata per halaman:
 
 ```vue
 <script setup lang="ts">
 useSeoMeta({
-  title: 'Page Title',
-  description: 'Page description for search engines',
+  title: 'Judul Halaman',
+  description: 'Deskripsi halaman untuk mesin pencari',
   ogImage: '/og-image.png',
 })
 </script>
 ```
 
-The module generates sitemap, robots.txt, and structured data automatically.
+Modul ini otomatis menghasilkan sitemap, robots.txt, dan structured data.
 
 ### @nuxt/image
 
-Use `<NuxtImg>` for optimized images:
+Gunakan `<NuxtImg>` untuk gambar yang teroptimasi:
 
 ```vue
 <template>
-  <NuxtImg src="/images/photo.jpg" width="800" height="600" loading="lazy" />
+  <NuxtImg src="/images/foto.jpg" width="800" height="600" loading="lazy" />
 </template>
 ```
 
 ### @nuxtjs/color-mode
 
-Dark mode is configured with system preference detection:
+Dark mode dikonfigurasi dengan deteksi preferensi sistem:
 
 ```vue
 <script setup lang="ts">
@@ -183,11 +213,11 @@ colorMode.preference = 'dark' // 'light', 'dark', 'system'
 </script>
 ```
 
-Use Tailwind's `dark:` variant for dark mode styles.
+Gunakan variant `dark:` dari Tailwind untuk style dark mode.
 
 ### @pinia/nuxt
 
-Stores are auto-imported from `app/stores/`:
+Store di-auto-import dari `app/stores/`:
 
 ```typescript
 // app/stores/auth.ts
@@ -208,7 +238,7 @@ const auth = useAuthStore()
 
 ### @nuxt/icon
 
-Use 200k+ icons from Iconify:
+Gunakan 200k+ ikon dari Iconify:
 
 ```vue
 <template>
@@ -219,7 +249,7 @@ Use 200k+ icons from Iconify:
 
 ### @vueuse/nuxt
 
-All VueUse composables are auto-imported:
+Semua composable VueUse di-auto-import:
 
 ```vue
 <script setup lang="ts">
@@ -231,54 +261,75 @@ const { copy } = useClipboard()
 
 ## Docker
 
-### Build and run
+### Build dan jalankan
 
 ```bash
-# Build the image
+# Build image
 docker build -t nuxt-app .
 
-# Run the container
+# Jalankan container
 docker run -p 3000:3000 nuxt-app
 
-# Or use Docker Compose
+# Atau gunakan Docker Compose
 docker compose up -d
 ```
 
-## Documentation
+## Konsep Dasar Nuxt
 
-| Document                 | Description                                           |
-| ------------------------ | ----------------------------------------------------- |
-| [RULES.md](./RULES.md)   | Development rules, naming conventions, file structure |
-| [CLAUDE.md](./CLAUDE.md) | AI code review guidelines                             |
+Jika kamu baru mengenal Nuxt, berikut istilah-istilah penting yang akan sering ditemui:
 
-## Before Committing
+| Istilah                | Penjelasan                                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **SSR**                | Server-Side Rendering — halaman di-render di server sebelum dikirim ke browser, sehingga lebih cepat dan SEO-friendly |
+| **SSG**                | Static Site Generation — halaman di-generate saat build, cocok untuk konten yang jarang berubah                       |
+| **Nitro**              | Engine server bawaan Nuxt yang menangani API routes, middleware, dan rendering di sisi server                         |
+| **Auto-import**        | Fitur Nuxt yang otomatis mengimpor komponen, composable, dan utilitas tanpa perlu menulis `import` manual             |
+| **File-based Routing** | Setiap file `.vue` di `app/pages/` otomatis menjadi route — tidak perlu konfigurasi router manual                     |
+| **Composable**         | Fungsi reusable yang menggunakan Vue Composition API (prefix `use`), misalnya `useAuth()`, `useFetch()`               |
+| **Layout**             | Komponen pembungkus halaman (header, footer, sidebar) yang bisa dipakai ulang di berbagai halaman                     |
+| **Middleware**         | Fungsi yang berjalan sebelum navigasi ke halaman tertentu, biasanya untuk pengecekan autentikasi                      |
+| **Plugin**             | Kode yang dijalankan saat aplikasi diinisialisasi, untuk mendaftarkan library atau konfigurasi global                 |
+| **`useFetch`**         | Composable bawaan Nuxt untuk mengambil data dari API — otomatis bekerja di SSR dan client                             |
+| **`$fetch`**           | Fungsi fetch bawaan Nuxt (berbasis `ofetch`), digunakan di dalam store atau event handler (bukan di `<script setup>`) |
+| **Runtime Config**     | Cara Nuxt mengelola environment variable — yang ber-prefix `NUXT_PUBLIC_` bisa diakses client, sisanya hanya server   |
+| **`app/` directory**   | Struktur direktori baru di Nuxt 4 yang memisahkan kode aplikasi dari konfigurasi root project                         |
+| **`shared/`**          | Folder untuk kode yang dipakai bersama antara `app/` (client) dan `server/`                                           |
 
-Git hooks are configured via Husky and run automatically:
+## Sebelum Commit
 
-- **pre-commit** -- runs `lint-staged` (ESLint fix + Prettier on staged files)
-- **commit-msg** -- validates commit message format via commitlint
+Git hooks dikonfigurasi via Husky dan berjalan otomatis:
 
-Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/):
+- **pre-commit** — menjalankan `lint-staged` (ESLint fix + Prettier pada file yang di-stage)
+- **commit-msg** — memvalidasi format commit message via commitlint
+
+Commit message harus mengikuti [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat: add user authentication
-fix: resolve login redirect loop
-docs: update API documentation
-style: fix button alignment
-refactor: extract validation logic
-test: add unit tests for auth composable
+feat: tambah autentikasi user
+fix: perbaiki loop redirect login
+docs: update dokumentasi API
+style: perbaiki alignment tombol
+refactor: ekstrak logika validasi
+test: tambah unit test untuk auth composable
 chore: update dependencies
 ```
 
-You can also run checks manually:
+Kamu juga bisa menjalankan pengecekan secara manual:
 
 ```bash
-pnpm run lint:fix     # Fix lint errors
-pnpm run format       # Format code
-pnpm run type-check   # Verify TypeScript types
-pnpm run test:run     # Run unit tests
+pnpm run lint:fix     # Fix error lint
+pnpm run format       # Format kode
+pnpm run type-check   # Verifikasi TypeScript types
+pnpm run test:run     # Jalankan unit tests
 ```
 
-## License
+## Referensi
 
-Private project. All rights reserved.
+| Dokumen                  | Deskripsi                                                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [RULES.md](./RULES.md)   | Aturan development, konvensi penamaan, struktur file                                                                                                    |
+| [CLAUDE.md](./CLAUDE.md) | Panduan untuk AI tools (Claude, Copilot, dll) — berisi konteks teknis project agar AI bisa bantu lebih akurat. Tidak perlu dibaca manual oleh developer |
+
+## Lisensi
+
+Project privat. Hak cipta dilindungi.

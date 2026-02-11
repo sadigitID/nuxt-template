@@ -1,152 +1,171 @@
-# Nuxt 4 Template - Development Rules & Conventions
+# Aturan Development - Nuxt 4 Template
 
-This document defines the coding standards, naming conventions, file structure, and best practices for this Nuxt 4 project. All contributors must follow these guidelines.
+Dokumen ini mendefinisikan standar coding, konvensi penamaan, struktur file, dan best practice untuk project Nuxt 4 ini. Semua kontributor wajib mengikuti panduan ini.
 
----
-
-## Table of Contents
-
-- [Directory Structure](#directory-structure)
-- [File Naming Conventions](#file-naming-conventions)
-- [Component Guidelines](#component-guidelines)
-- [Composables Guidelines](#composables-guidelines)
-- [Page Guidelines](#page-guidelines)
-- [Layout Guidelines](#layout-guidelines)
-- [Middleware Guidelines](#middleware-guidelines)
-- [Plugin Guidelines](#plugin-guidelines)
-- [Store Guidelines (Pinia)](#store-guidelines-pinia)
-- [Server API Guidelines](#server-api-guidelines)
-- [Shared Code Guidelines](#shared-code-guidelines)
-- [TypeScript Standards](#typescript-standards)
-- [Tailwind CSS Standards](#tailwind-css-standards)
-- [SSR Compatibility](#ssr-compatibility)
-- [Data Fetching](#data-fetching)
-- [Error Handling](#error-handling)
-- [Testing Standards](#testing-standards)
-- [Git Workflow](#git-workflow)
-- [Performance Guidelines](#performance-guidelines)
-- [Security Guidelines](#security-guidelines)
-- [Quick Reference](#quick-reference)
+> **Glosarium Singkat**
+>
+> - **SSR (Server-Side Rendering):** Halaman di-render di server sebelum dikirim ke browser, sehingga lebih cepat untuk pengguna dan lebih mudah diindeks mesin pencari.
+> - **Auto-import:** Fitur Nuxt yang secara otomatis menyediakan komponen, composable, dan utilitas tanpa perlu menulis `import` manual di setiap file.
+> - **Composable:** Fungsi reusable yang menggunakan Vue Composition API (selalu diawali prefix `use`), misalnya `useAuth()`, `useCounter()`.
+> - **`useFetch` vs `$fetch`:** `useFetch()` digunakan di `<script setup>` untuk mengambil data (SSR-compatible). `$fetch()` digunakan di dalam store, event handler, atau konteks non-setup.
+> - **`definePageMeta`:** Macro Nuxt untuk mendefinisikan metadata halaman (layout, middleware) di dalam `<script setup>`.
+> - **Nitro:** Engine server bawaan Nuxt yang menangani API routes (`server/api/`), middleware, dan rendering di sisi server.
+> - **File-based Routing:** Setiap file `.vue` di `app/pages/` otomatis menjadi route — tidak perlu konfigurasi router manual.
+> - **Runtime Config:** Cara Nuxt mengelola environment variable. Variable ber-prefix `NUXT_PUBLIC_` bisa diakses di client, sisanya hanya server.
+> - **`app/` directory:** Struktur direktori baru di Nuxt 4 yang memisahkan kode aplikasi dari konfigurasi root project.
+> - **`shared/`:** Folder untuk kode yang dipakai bersama antara `app/` (client) dan `server/`.
+> - **`useState`:** Composable Nuxt untuk membuat reactive state yang aman saat hydration (data berpindah dari server ke client tanpa inkonsistensi).
+> - **Hydration:** Proses di mana Vue "menghidupkan" HTML statis yang sudah di-render server agar menjadi interaktif di browser.
 
 ---
 
-## Directory Structure
+## Daftar Isi
+
+- [Struktur Direktori](#struktur-direktori)
+- [Konvensi Penamaan File](#konvensi-penamaan-file)
+- [Aturan Komponen](#aturan-komponen)
+- [Aturan Composable](#aturan-composable)
+- [Aturan Halaman (Pages)](#aturan-halaman-pages)
+- [Aturan Layout](#aturan-layout)
+- [Aturan Middleware](#aturan-middleware)
+- [Aturan Plugin](#aturan-plugin)
+- [Aturan Store (Pinia)](#aturan-store-pinia)
+- [Aturan Server API](#aturan-server-api)
+- [Aturan Shared Code](#aturan-shared-code)
+- [Aturan TypeScript](#aturan-typescript)
+- [Aturan Tailwind CSS](#aturan-tailwind-css)
+- [Aturan SSR](#aturan-ssr)
+- [Aturan Data Fetching](#aturan-data-fetching)
+- [Aturan Error Handling](#aturan-error-handling)
+- [Aturan Testing](#aturan-testing)
+- [Aturan Git Workflow](#aturan-git-workflow)
+- [Aturan Performa](#aturan-performa)
+- [Aturan Keamanan](#aturan-keamanan)
+- [Referensi Cepat](#referensi-cepat)
+
+---
+
+## Struktur Direktori
+
+Nuxt 4 menggunakan struktur `app/` directory yang memisahkan kode aplikasi dari file konfigurasi di root project. Struktur ini membuat project lebih rapi seiring bertambahnya fitur.
 
 ```
 nuxt-template/
-├── app/                          # Application code (Nuxt 4)
-│   ├── assets/                   # Static assets (processed by bundler)
+├── app/                          # Kode aplikasi (Nuxt 4)
+│   ├── assets/                   # Aset statis (diproses bundler)
 │   │   └── css/
-│   │       └── main.css          # Global CSS (Tailwind entry)
-│   ├── components/               # Auto-imported Vue components
-│   │   ├── common/               # Reusable UI components (Button, Modal, etc.)
-│   │   └── features/             # Feature-specific components (UserCard, etc.)
-│   ├── composables/              # Auto-imported composition functions
+│   │       └── main.css          # Global CSS (entry Tailwind)
+│   ├── components/               # Komponen Vue (auto-import)
+│   │   ├── common/               # Komponen reusable (Button, Modal, dll)
+│   │   └── features/             # Komponen spesifik fitur (UserCard, dll)
+│   ├── composables/              # Composition functions (auto-import)
 │   ├── layouts/                  # Layout wrappers
 │   ├── middleware/               # Route middleware (client-side)
 │   ├── pages/                    # File-based routing
 │   ├── plugins/                  # Vue plugins
 │   ├── stores/                   # Pinia stores
-│   └── utils/                    # Client utilities (auto-imported)
+│   └── utils/                    # Utilitas client (auto-import)
 │
-├── server/                       # Server-side code (Nitro)
+├── server/                       # Kode server-side (Nitro)
 │   ├── api/                      # API endpoints (auto-routed)
 │   ├── middleware/                # Server middleware
 │   ├── plugins/                  # Server/Nitro plugins
 │   ├── routes/                   # Server routes
-│   └── utils/                    # Server utilities (auto-imported)
+│   └── utils/                    # Utilitas server (auto-import)
 │
-├── shared/                       # Shared between app and server
-│   ├── constants/                # Shared constants
-│   ├── types/                    # Shared TypeScript types
-│   └── utils/                    # Shared utility functions
+├── shared/                       # Dipakai bersama app dan server
+│   ├── constants/                # Konstanta
+│   ├── types/                    # TypeScript types
+│   └── utils/                    # Utility functions
 │
-├── public/                       # Static files (served as-is)
-├── test/                         # Test files
+├── public/                       # File statis (disajikan apa adanya)
+├── test/                         # File test
 │   ├── unit/                     # Vitest unit tests
 │   └── e2e/                      # Playwright E2E tests
 │
 ├── .github/workflows/            # GitHub Actions CI/CD
-├── nuxt.config.ts                # Nuxt configuration
-├── app.config.ts                 # App configuration (runtime)
-├── tailwind.config.ts            # Tailwind CSS configuration (if needed)
-├── tsconfig.json                 # TypeScript configuration
-├── eslint.config.mjs             # ESLint configuration
-├── .prettierrc.json              # Prettier configuration
-├── vitest.config.ts              # Vitest configuration
-├── playwright.config.ts          # Playwright configuration
-├── Dockerfile                    # Docker build configuration
-└── docker-compose.yml            # Docker Compose configuration
+├── nuxt.config.ts                # Konfigurasi Nuxt
+├── app.config.ts                 # Konfigurasi app (runtime)
+├── tailwind.config.ts            # Konfigurasi Tailwind CSS (jika perlu)
+├── tsconfig.json                 # Konfigurasi TypeScript
+├── eslint.config.mjs             # Konfigurasi ESLint
+├── .prettierrc.json              # Konfigurasi Prettier
+├── vitest.config.ts              # Konfigurasi Vitest
+├── playwright.config.ts          # Konfigurasi Playwright
+├── Dockerfile                    # Docker build
+└── docker-compose.yml            # Docker Compose
 ```
 
-### File Placement Rules
+### Aturan Penempatan File
 
-| Code Type         | Location             | Auto-imported |
-| ----------------- | -------------------- | ------------- |
-| Vue Components    | `app/components/`    | Yes           |
-| Page Components   | `app/pages/`         | -             |
-| Layouts           | `app/layouts/`       | -             |
-| Composables       | `app/composables/`   | Yes           |
-| Client Utilities  | `app/utils/`         | Yes           |
-| Route Middleware  | `app/middleware/`    | -             |
-| Vue Plugins       | `app/plugins/`       | Yes           |
-| Pinia Stores      | `app/stores/`        | Yes           |
-| API Endpoints     | `server/api/`        | -             |
-| Server Middleware | `server/middleware/` | -             |
-| Server Utilities  | `server/utils/`      | Yes           |
-| Server Plugins    | `server/plugins/`    | -             |
-| Shared Types      | `shared/types/`      | Yes           |
-| Shared Constants  | `shared/constants/`  | Yes           |
-| Shared Utilities  | `shared/utils/`      | Yes           |
-| Static Assets     | `public/`            | -             |
-| Bundled Assets    | `app/assets/`        | -             |
-| Unit Tests        | `test/unit/`         | -             |
-| E2E Tests         | `test/e2e/`          | -             |
+| Jenis Kode        | Lokasi               | Auto-import |
+| ----------------- | -------------------- | ----------- |
+| Komponen Vue      | `app/components/`    | Ya          |
+| Komponen Halaman  | `app/pages/`         | -           |
+| Layout            | `app/layouts/`       | -           |
+| Composable        | `app/composables/`   | Ya          |
+| Utilitas Client   | `app/utils/`         | Ya          |
+| Route Middleware  | `app/middleware/`    | -           |
+| Vue Plugin        | `app/plugins/`       | Ya          |
+| Pinia Store       | `app/stores/`        | Ya          |
+| API Endpoint      | `server/api/`        | -           |
+| Server Middleware | `server/middleware/` | -           |
+| Utilitas Server   | `server/utils/`      | Ya          |
+| Server Plugin     | `server/plugins/`    | -           |
+| Shared Types      | `shared/types/`      | Ya          |
+| Shared Constants  | `shared/constants/`  | Ya          |
+| Shared Utilities  | `shared/utils/`      | Ya          |
+| Aset Statis       | `public/`            | -           |
+| Aset Bundled      | `app/assets/`        | -           |
+| Unit Tests        | `test/unit/`         | -           |
+| E2E Tests         | `test/e2e/`          | -           |
 
 ---
 
-## File Naming Conventions
+## Konvensi Penamaan File
 
-### General Rules
+Bagian ini menjelaskan format penamaan untuk setiap jenis file dalam project. Konsistensi penamaan memudahkan developer lain memahami isi file hanya dari namanya.
 
-- Use **English** for all file names, variable names, and comments.
-- Avoid abbreviations unless universally understood (e.g., `id`, `url`, `api`).
-- File names must be descriptive and reflect their content.
+### Aturan Umum
 
-### Components (`app/components/`)
+- Gunakan **bahasa Inggris** untuk semua nama file, variable, dan komentar.
+- Hindari singkatan kecuali yang sudah umum (misalnya `id`, `url`, `api`).
+- Nama file harus deskriptif dan mencerminkan isinya.
 
-**Convention: `PascalCase.vue`**
+### Komponen (`app/components/`)
 
-Components are organized in subdirectories by category. The directory name becomes part of the auto-import name.
+**Konvensi: `PascalCase.vue`**
+
+Komponen diorganisir dalam subdirektori berdasarkan kategori. Nama direktori menjadi bagian dari nama auto-import.
 
 ```
 app/components/
-├── common/                       # Reusable base components
+├── common/                       # Komponen reusable
 │   ├── Button.vue                # -> <CommonButton />
 │   ├── Modal.vue                 # -> <CommonModal />
 │   ├── Input.vue                 # -> <CommonInput />
 │   ├── ColorModeToggle.vue       # -> <CommonColorModeToggle />
 │   └── DataTable.vue             # -> <CommonDataTable />
-├── features/                     # Feature-specific components
+├── features/                     # Komponen spesifik fitur
 │   ├── UserCard.vue              # -> <FeaturesUserCard />
 │   ├── ProductList.vue           # -> <FeaturesProductList />
 │   └── DashboardChart.vue        # -> <FeaturesDashboardChart />
-└── layout/                       # Layout-related components
+└── layout/                       # Komponen terkait layout
     ├── Navbar.vue                # -> <LayoutNavbar />
     ├── Sidebar.vue               # -> <LayoutSidebar />
     └── Footer.vue                # -> <LayoutFooter />
 ```
 
-Rules:
+Aturan:
 
-- Always use `PascalCase` for component files.
-- Group by function: `common/` for reusable, `features/` for domain-specific.
-- Component names should be nouns or noun phrases.
-- Avoid generic names like `Item.vue` or `List.vue` without context.
+- Selalu gunakan `PascalCase` untuk file komponen.
+- Kelompokkan berdasarkan fungsi: `common/` untuk reusable, `features/` untuk domain-specific.
+- Nama komponen harus berupa kata benda (noun) atau frasa kata benda.
+- Hindari nama generik seperti `Item.vue` atau `List.vue` tanpa konteks.
 
-### Pages (`app/pages/`)
+### Halaman (`app/pages/`)
 
-**Convention: `kebab-case.vue`**
+**Konvensi: `kebab-case.vue`**
 
 ```
 app/pages/
@@ -155,7 +174,7 @@ app/pages/
 ├── contact.vue                   # Route: /contact
 ├── users/
 │   ├── index.vue                 # Route: /users
-│   └── [id].vue                  # Route: /users/:id (dynamic)
+│   └── [id].vue                  # Route: /users/:id (dinamis)
 ├── blog/
 │   ├── index.vue                 # Route: /blog
 │   └── [slug].vue                # Route: /blog/:slug
@@ -164,90 +183,90 @@ app/pages/
     └── settings.vue              # Route: /admin/settings
 ```
 
-Rules:
+Aturan:
 
-- Always use `kebab-case` for page files.
-- Use `index.vue` for directory root routes.
-- Use `[param].vue` for dynamic route parameters.
-- Use `[...slug].vue` for catch-all routes.
-- Nested directories = nested routes.
+- Selalu gunakan `kebab-case` untuk file halaman.
+- Gunakan `index.vue` untuk route root direktori.
+- Gunakan `[param].vue` untuk parameter route dinamis.
+- Gunakan `[...slug].vue` untuk catch-all routes.
+- Direktori bersarang = route bersarang.
 
-### Layouts (`app/layouts/`)
+### Layout (`app/layouts/`)
 
-**Convention: `kebab-case.vue`**
+**Konvensi: `kebab-case.vue`**
 
 ```
 app/layouts/
-├── default.vue                   # Default layout
-├── auth.vue                      # Auth pages layout (login, register)
-└── admin.vue                     # Admin panel layout
+├── default.vue                   # Layout default
+├── auth.vue                      # Layout halaman auth (login, register)
+└── admin.vue                     # Layout panel admin
 ```
 
-### Composables (`app/composables/`)
+### Composable (`app/composables/`)
 
-**Convention: `useCamelCase.ts`**
+**Konvensi: `useCamelCase.ts`**
 
 ```
 app/composables/
-├── useCounter.ts                 # Counter logic
-├── useAuth.ts                    # Authentication state
-├── useForm.ts                    # Form handling
-└── useNotification.ts            # Notification system
+├── useCounter.ts                 # Logika counter
+├── useAuth.ts                    # State autentikasi
+├── useForm.ts                    # Penanganan form
+└── useNotification.ts            # Sistem notifikasi
 ```
 
-Rules:
+Aturan:
 
-- Always prefix with `use`.
-- Each file exports one primary composable function.
-- Name must describe the functionality.
+- Selalu diawali prefix `use`.
+- Setiap file meng-export satu composable utama.
+- Nama harus mendeskripsikan fungsionalitasnya.
 
 ### Middleware (`app/middleware/`)
 
-**Convention: `kebab-case.ts`**
+**Konvensi: `kebab-case.ts`**
 
 ```
 app/middleware/
-├── auth.ts                       # Authentication check
-├── guest.ts                      # Guest-only pages
-└── admin-only.ts                 # Admin role check
+├── auth.ts                       # Cek autentikasi
+├── guest.ts                      # Halaman khusus guest
+└── admin-only.ts                 # Cek role admin
 ```
 
-### Plugins (`app/plugins/`)
+### Plugin (`app/plugins/`)
 
-**Convention: `kebab-case.ts`**
+**Konvensi: `kebab-case.ts`**
 
 ```
 app/plugins/
 ├── error-handler.ts              # Global error handler
-├── analytics.client.ts           # Client-only analytics plugin
-└── logger.server.ts              # Server-only logger plugin
+├── analytics.client.ts           # Plugin analytics (client-only)
+└── logger.server.ts              # Plugin logger (server-only)
 ```
 
-Rules:
+Aturan:
 
-- Use `.client.ts` suffix for client-only plugins.
-- Use `.server.ts` suffix for server-only plugins.
-- No suffix = runs on both client and server.
+- Gunakan suffix `.client.ts` untuk plugin yang hanya berjalan di client.
+- Gunakan suffix `.server.ts` untuk plugin yang hanya berjalan di server.
+- Tanpa suffix = berjalan di client dan server.
 
-### Pinia Stores (`app/stores/`)
+### Pinia Store (`app/stores/`)
 
-**Convention: `camelCase.ts`**
+**Konvensi: `camelCase.ts`**
 
 ```
 app/stores/
-├── app.ts                        # App-wide state
-├── auth.ts                       # Authentication state
-└── user.ts                       # User state
+├── app.ts                        # State app-wide
+├── auth.ts                       # State autentikasi
+└── user.ts                       # State user
 ```
 
-Rules:
+Aturan:
 
-- Store name in `defineStore()` should match the file name.
-- Use Setup Stores syntax (Composition API) over Options Stores.
+- Nama store di `defineStore()` harus sesuai nama file.
+- Gunakan Setup Store syntax (Composition API), bukan Options Store.
 
 ### Server API Routes (`server/api/`)
 
-**Convention: `kebab-case.method.ts`**
+**Konvensi: `kebab-case.method.ts`**
 
 ```
 server/api/
@@ -256,48 +275,48 @@ server/api/
 ├── users/
 │   ├── index.get.ts              # GET  /api/users
 │   ├── index.post.ts             # POST /api/users
-│   └── [id].get.ts               # GET  /api/users/:id
-│   └── [id].put.ts               # PUT  /api/users/:id
+│   ├── [id].get.ts               # GET  /api/users/:id
+│   ├── [id].put.ts               # PUT  /api/users/:id
 │   └── [id].delete.ts            # DELETE /api/users/:id
 └── auth/
     ├── login.post.ts             # POST /api/auth/login
     └── logout.post.ts            # POST /api/auth/logout
 ```
 
-Rules:
+Aturan:
 
-- Always suffix with HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`, `.patch.ts`.
-- Use `[param]` for dynamic parameters.
-- Group related endpoints in subdirectories.
+- Selalu gunakan suffix HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`, `.patch.ts`.
+- Gunakan `[param]` untuk parameter dinamis.
+- Kelompokkan endpoint terkait dalam subdirektori.
 
-### Server Utilities (`server/utils/`)
+### Utilitas Server (`server/utils/`)
 
-**Convention: `kebab-case.ts` or `camelCase.ts`**
+**Konvensi: `kebab-case.ts` atau `camelCase.ts`**
 
 ```
 server/utils/
-├── response.ts                   # Response helpers
-├── validation.ts                 # Validation utilities
-└── auth.ts                       # Auth utilities
+├── response.ts                   # Helper response
+├── validation.ts                 # Utilitas validasi
+└── auth.ts                       # Utilitas auth
 ```
 
 ### Shared Code (`shared/`)
 
-**Convention: `kebab-case.ts` for files, `kebab-case/` for directories**
+**Konvensi: `kebab-case.ts` untuk file, `kebab-case/` untuk direktori**
 
 ```
 shared/
 ├── types/
-│   └── index.ts                  # All shared types
+│   └── index.ts                  # Semua shared types
 ├── constants/
-│   └── index.ts                  # All shared constants
+│   └── index.ts                  # Semua shared constants
 └── utils/
-    └── index.ts                  # All shared utilities
+    └── index.ts                  # Semua shared utilities
 ```
 
-### Test Files (`test/`)
+### File Test (`test/`)
 
-**Convention: `kebab-case.spec.ts` or `kebab-case.test.ts`**
+**Konvensi: `kebab-case.spec.ts` atau `kebab-case.test.ts`**
 
 ```
 test/
@@ -315,15 +334,17 @@ test/
 
 ---
 
-## Component Guidelines
+## Aturan Komponen
 
-### Template Order
+Bagian ini mengatur bagaimana komponen Vue harus ditulis. Urutan yang konsisten membuat kode lebih mudah dibaca dan di-review, terutama saat project berkembang dengan banyak kontributor.
 
-Always structure Vue SFC files in this order:
+### Urutan Template
+
+Selalu susun file Vue SFC dalam urutan ini:
 
 ```vue
 <script setup lang="ts">
-// Content
+// Konten
 </script>
 
 <template>
@@ -331,29 +352,29 @@ Always structure Vue SFC files in this order:
 </template>
 
 <style scoped>
-/* Styles (prefer Tailwind classes in template) */
+/* Style (utamakan class Tailwind di template) */
 </style>
 ```
 
-### Script Setup Structure
+### Urutan di Script Setup
 
-Follow this ordering within `<script setup>`:
+Ikuti urutan ini di dalam `<script setup>`:
 
 ```vue
 <script setup lang="ts">
-// 1. Page Meta (pages only)
+// 1. Page Meta (hanya di halaman)
 definePageMeta({
   layout: 'default',
   middleware: ['auth'],
 })
 
-// 2. SEO Meta (pages only)
+// 2. SEO Meta (hanya di halaman)
 useSeoMeta({
-  title: 'Page Title',
-  description: 'Page description',
+  title: 'Judul Halaman',
+  description: 'Deskripsi halaman',
 })
 
-// 3. Type imports
+// 3. Import type
 import type { User } from '~/shared/types'
 
 // 4. Props
@@ -371,7 +392,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
-// 6. Composables (auto-imported)
+// 6. Composable (auto-import)
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
@@ -405,18 +426,20 @@ watch(searchQuery, (newValue) => {
 </script>
 ```
 
-### Component Rules
+### Aturan Komponen
 
-- Always use `<script setup lang="ts">`.
-- Always use **scoped styles** or Tailwind classes (prefer Tailwind).
-- Define Props and Emits with TypeScript interfaces.
-- Use `withDefaults()` for default prop values.
-- Never import components manually -- they are auto-imported.
-- Component templates should be clean and readable.
+- Selalu gunakan `<script setup lang="ts">`.
+- Selalu gunakan **scoped styles** atau class Tailwind (utamakan Tailwind).
+- Definisikan Props dan Emits dengan interface TypeScript.
+- Gunakan `withDefaults()` untuk nilai default props.
+- Jangan import komponen secara manual — mereka di-auto-import.
+- Template komponen harus bersih dan mudah dibaca.
 
 ---
 
-## Composables Guidelines
+## Aturan Composable
+
+Composable adalah fungsi reusable yang mengenkapsulasi logika reaktif. Dengan meletakkannya di `app/composables/`, Nuxt akan otomatis meng-import-nya di seluruh aplikasi.
 
 ```typescript
 // app/composables/useCounter.ts
@@ -452,29 +475,31 @@ export function useCounter(initialValue = 0) {
 }
 ```
 
-Rules:
+Aturan:
 
-- Always prefix function name with `use`.
-- Export a named function (not default export).
-- Return reactive refs and methods.
-- Consider returning `readonly()` refs when mutation should only happen through methods.
-- No side effects on import -- side effects should be in `onMounted` or similar.
+- Selalu awali nama fungsi dengan `use`.
+- Export named function (bukan default export).
+- Return reactive refs dan methods.
+- Pertimbangkan mengembalikan `readonly()` refs jika mutasi hanya boleh dilakukan melalui methods.
+- Tidak boleh ada side effect saat import — side effect harus di `onMounted` atau sejenisnya.
 
 ---
 
-## Page Guidelines
+## Aturan Halaman (Pages)
+
+Setiap file di `app/pages/` otomatis menjadi route. Halaman adalah titik masuk utama bagi pengguna, jadi penting untuk selalu menyertakan SEO metadata dan mengambil data dengan cara yang SSR-compatible.
 
 ```vue
 <script setup lang="ts">
-// 1. Define page metadata
+// 1. Definisikan metadata halaman
 definePageMeta({
   layout: 'default',
 })
 
 // 2. SEO
 useSeoMeta({
-  title: 'About',
-  description: 'Learn more about us',
+  title: 'Tentang',
+  description: 'Pelajari lebih lanjut tentang kami',
 })
 
 // 3. Data fetching (SSR)
@@ -483,29 +508,31 @@ const { data: users } = await useFetch('/api/users')
 
 <template>
   <div>
-    <h1>About</h1>
-    <!-- Page content -->
+    <h1>Tentang</h1>
+    <!-- Konten halaman -->
   </div>
 </template>
 ```
 
-Rules:
+Aturan:
 
-- Always set `useSeoMeta()` for SEO.
-- Use `useFetch()` or `useAsyncData()` for server-side data fetching.
-- Never use `fetch()` or `axios` directly in pages -- use `useFetch()`.
-- Never fetch data in `onMounted()` -- this won't work with SSR.
+- Selalu set `useSeoMeta()` untuk SEO.
+- Gunakan `useFetch()` atau `useAsyncData()` untuk pengambilan data di sisi server.
+- Jangan gunakan `fetch()` atau `axios` langsung di halaman — gunakan `useFetch()`.
+- Jangan ambil data di `onMounted()` — ini tidak akan bekerja dengan SSR.
 
 ---
 
-## Layout Guidelines
+## Aturan Layout
+
+Layout adalah komponen pembungkus yang mendefinisikan struktur umum halaman (header, footer, sidebar). Dengan memisahkan layout, kamu bisa mengganti tampilan keseluruhan halaman hanya dengan mengubah satu baris di `definePageMeta`.
 
 ```vue
 <!-- app/layouts/default.vue -->
 <template>
   <div>
     <header>
-      <!-- Navigation -->
+      <!-- Navigasi -->
     </header>
 
     <main>
@@ -513,21 +540,23 @@ Rules:
     </main>
 
     <footer>
-      <!-- Footer content -->
+      <!-- Konten footer -->
     </footer>
   </div>
 </template>
 ```
 
-Rules:
+Aturan:
 
-- Layouts must contain a `<slot />` for page content.
-- Keep layouts minimal -- heavy logic belongs in components.
-- Use `definePageMeta({ layout: 'name' })` in pages to select layout.
+- Layout harus mengandung `<slot />` untuk konten halaman.
+- Jaga layout tetap minimal — logika berat harus di komponen.
+- Gunakan `definePageMeta({ layout: 'nama' })` di halaman untuk memilih layout.
 
 ---
 
-## Middleware Guidelines
+## Aturan Middleware
+
+Middleware adalah fungsi yang berjalan sebelum navigasi ke halaman tertentu. Ada dua jenis: route middleware (client-side, di `app/middleware/`) dan server middleware (di `server/middleware/`).
 
 ### Route Middleware (Client-side)
 
@@ -554,38 +583,42 @@ export default defineEventHandler((event) => {
 })
 ```
 
-Rules:
+Aturan:
 
-- Route middleware in `app/middleware/` runs on navigation.
-- Server middleware in `server/middleware/` runs on every server request.
-- Use `defineNuxtRouteMiddleware` for route middleware.
-- Use `defineEventHandler` for server middleware.
+- Route middleware di `app/middleware/` berjalan saat navigasi halaman.
+- Server middleware di `server/middleware/` berjalan di setiap request server.
+- Gunakan `defineNuxtRouteMiddleware` untuk route middleware.
+- Gunakan `defineEventHandler` untuk server middleware.
 
 ---
 
-## Plugin Guidelines
+## Aturan Plugin
+
+Plugin adalah kode yang dijalankan saat aplikasi diinisialisasi. Gunakan plugin untuk mendaftarkan library global, menambah error handler, atau mengonfigurasi integrasi pihak ketiga.
 
 ```typescript
 // app/plugins/error-handler.ts
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.config.errorHandler = (error, instance, info) => {
-    // Handle error
+    // Tangani error
   }
 })
 ```
 
-Rules:
+Aturan:
 
-- Use `.client.ts` suffix for client-only plugins.
-- Use `.server.ts` suffix for server-only plugins.
-- Use `defineNuxtPlugin` for app plugins.
-- Use `defineNitroPlugin` for server plugins.
+- Gunakan suffix `.client.ts` untuk plugin yang hanya berjalan di client.
+- Gunakan suffix `.server.ts` untuk plugin yang hanya berjalan di server.
+- Gunakan `defineNuxtPlugin` untuk app plugin.
+- Gunakan `defineNitroPlugin` untuk server plugin.
 
 ---
 
-## Store Guidelines (Pinia)
+## Aturan Store (Pinia)
 
-Use the **Setup Store** syntax (Composition API style):
+Pinia adalah state management resmi Vue. Gunakan store untuk state yang perlu diakses dari banyak komponen. Untuk state lokal atau yang hanya dibagi 2-3 komponen, cukup gunakan `ref()` + props/emits.
+
+Gunakan sintaks **Setup Store** (Composition API):
 
 ```typescript
 // app/stores/auth.ts
@@ -627,17 +660,19 @@ export const useAuthStore = defineStore('auth', () => {
 })
 ```
 
-Rules:
+Aturan:
 
-- Always use Setup Store syntax.
-- Store name in `defineStore('name')` must match the file name.
-- Export the store function with `use` prefix and `Store` suffix: `useAuthStore`.
-- Return `readonly()` for state that should only be modified via actions.
-- Use `$fetch` (not `useFetch`) inside store actions.
+- Selalu gunakan Setup Store syntax.
+- Nama store di `defineStore('nama')` harus sesuai nama file.
+- Export fungsi store dengan prefix `use` dan suffix `Store`: `useAuthStore`.
+- Return `readonly()` untuk state yang hanya boleh diubah via actions.
+- Gunakan `$fetch` (bukan `useFetch`) di dalam store actions.
 
 ---
 
-## Server API Guidelines
+## Aturan Server API
+
+Server API routes di `server/api/` otomatis menjadi endpoint HTTP. Nuxt menggunakan Nitro sebagai engine server, jadi setiap file langsung bisa diakses tanpa konfigurasi routing tambahan.
 
 ### Route Handlers
 
@@ -646,10 +681,10 @@ Rules:
 export default defineEventHandler(async (event) => {
   const { page, perPage } = parsePaginationParams(event)
 
-  // Fetch data
+  // Ambil data
   const users = await getUsers({ page, perPage })
 
-  // Return standardized response
+  // Return response terstandarisasi
   return createPaginatedResponse(users.data, {
     page,
     perPage,
@@ -661,48 +696,50 @@ export default defineEventHandler(async (event) => {
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
 
-  // Validate
+  // Validasi
   if (!body.name || !body.email) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Name and email are required',
+      statusMessage: 'Name dan email wajib diisi',
     })
   }
 
-  // Create
+  // Buat user
   const user = await createUser(body)
 
-  return createApiResponse(user, 'User created successfully')
+  return createApiResponse(user, 'User berhasil dibuat')
 })
 ```
 
-Rules:
+Aturan:
 
-- Always suffix files with HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`.
-- Always validate input.
-- Use `createError()` for error responses with proper status codes.
-- Use server utility functions (`createApiResponse`, `createPaginatedResponse`) for consistent responses.
-- Use `readBody()` for POST/PUT/PATCH body.
-- Use `getQuery()` for query parameters.
-- Use `getRouterParam()` for route parameters.
+- Selalu gunakan suffix HTTP method: `.get.ts`, `.post.ts`, `.put.ts`, `.delete.ts`.
+- Selalu validasi input.
+- Gunakan `createError()` untuk response error dengan status code yang tepat.
+- Gunakan utility functions server (`createApiResponse`, `createPaginatedResponse`) untuk response yang konsisten.
+- Gunakan `readBody()` untuk body POST/PUT/PATCH.
+- Gunakan `getQuery()` untuk query parameters.
+- Gunakan `getRouterParam()` untuk route parameters.
 
 ---
 
-## Shared Code Guidelines
+## Aturan Shared Code
+
+Folder `shared/` khusus untuk kode yang benar-benar dibutuhkan oleh **kedua** sisi: `app/` (client) dan `server/`. Jika kode hanya dipakai di satu sisi, letakkan di `app/utils/` atau `server/utils/`.
 
 ### Types (`shared/types/`)
 
 ```typescript
 // shared/types/index.ts
 
-// API response types
+// Tipe response API
 export interface ApiResponse<T> {
   success: boolean
   data: T
   message?: string
 }
 
-// Domain types
+// Tipe domain
 export interface User {
   id: string
   name: string
@@ -731,73 +768,77 @@ export function slugify(text: string): string {
 }
 ```
 
-Rules:
+Aturan:
 
-- Only put code here that is needed by **both** `app/` and `server/`.
-- If code is only used on the client, put it in `app/utils/`.
-- If code is only used on the server, put it in `server/utils/`.
-- Code in `shared/` must not use browser APIs or Node.js-specific APIs.
+- Hanya letakkan kode yang dibutuhkan **kedua** sisi (`app/` dan `server/`).
+- Jika kode hanya dipakai di client, taruh di `app/utils/`.
+- Jika kode hanya dipakai di server, taruh di `server/utils/`.
+- Kode di `shared/` tidak boleh menggunakan browser API atau Node.js-specific API.
 
 ---
 
-## TypeScript Standards
+## Aturan TypeScript
+
+TypeScript strict mode memastikan tipe data diperiksa secara ketat saat development, sehingga bug bisa tertangkap lebih awal sebelum kode berjalan di production.
 
 ### Strict Mode
 
-TypeScript strict mode is enabled. No exceptions.
+TypeScript strict mode aktif. Tidak ada pengecualian.
 
 ```typescript
-// GOOD
+// BENAR
 function getUser(id: string): User | null { ... }
 
-// BAD - No 'any' types
+// SALAH - Tidak boleh pakai 'any'
 function getUser(id: any): any { ... }
 ```
 
-### Naming Conventions
+### Konvensi Penamaan
 
-| Type            | Convention  | Example                    |
-| --------------- | ----------- | -------------------------- |
-| Variables       | camelCase   | `const userName = 'John'`  |
-| Constants       | UPPER_SNAKE | `const MAX_RETRIES = 3`    |
-| Functions       | camelCase   | `function getUser() {}`    |
-| Interfaces      | PascalCase  | `interface UserProfile {}` |
-| Types           | PascalCase  | `type UserRole = 'admin'`  |
-| Enums           | PascalCase  | `enum Status { Active }`   |
-| Type Parameters | T, U, K, V  | `function map<T, U>() {}`  |
+| Jenis          | Konvensi    | Contoh                     |
+| -------------- | ----------- | -------------------------- |
+| Variable       | camelCase   | `const userName = 'John'`  |
+| Konstanta      | UPPER_SNAKE | `const MAX_RETRIES = 3`    |
+| Function       | camelCase   | `function getUser() {}`    |
+| Interface      | PascalCase  | `interface UserProfile {}` |
+| Type           | PascalCase  | `type UserRole = 'admin'`  |
+| Enum           | PascalCase  | `enum Status { Active }`   |
+| Type Parameter | T, U, K, V  | `function map<T, U>() {}`  |
 
-### Import Order
+### Urutan Import
 
-When explicit imports are needed (rare with Nuxt auto-imports):
+Ketika import eksplisit dibutuhkan (jarang dengan auto-import Nuxt):
 
 ```typescript
-// 1. Type imports
+// 1. Import type
 import type { User } from '~/shared/types'
 
-// 2. External packages
+// 2. Package eksternal
 import { z } from 'zod'
 
-// 3. Internal modules
+// 3. Modul internal
 import { formatDate } from '~/app/utils/format'
 ```
 
 ---
 
-## Tailwind CSS Standards
+## Aturan Tailwind CSS
 
-### Usage
+Tailwind CSS menggunakan pendekatan utility-first: alih-alih menulis CSS kustom, kamu menyusun tampilan langsung di template menggunakan class utilitas. Ini membuat styling lebih konsisten dan mengurangi CSS yang tidak terpakai.
 
-- Prefer Tailwind utility classes over custom CSS.
-- Use `<style scoped>` only when Tailwind classes are insufficient.
-- Use Tailwind's dark mode variant (`dark:`) for dark mode styles.
+### Penggunaan
+
+- Utamakan class Tailwind daripada CSS kustom.
+- Gunakan `<style scoped>` hanya jika class Tailwind tidak memadai.
+- Gunakan variant `dark:` dari Tailwind untuk style dark mode.
 
 ```vue
-<!-- GOOD: Tailwind classes -->
+<!-- BENAR: Class Tailwind -->
 <template>
   <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Submit</button>
 </template>
 
-<!-- AVOID: Custom CSS for basic styling -->
+<!-- HINDARI: CSS kustom untuk styling dasar -->
 <style scoped>
 .submit-btn {
   border-radius: 8px;
@@ -808,74 +849,76 @@ import { formatDate } from '~/app/utils/format'
 </style>
 ```
 
-### Class Ordering
+### Urutan Class
 
-Follow this approximate order for Tailwind classes:
+Ikuti urutan berikut untuk class Tailwind:
 
 1. Layout: `flex`, `grid`, `block`, `inline`
-2. Sizing: `w-`, `h-`, `min-w-`, `max-w-`
-3. Spacing: `p-`, `m-`, `gap-`
-4. Typography: `text-`, `font-`, `leading-`
-5. Backgrounds: `bg-`
-6. Borders: `border-`, `rounded-`
-7. Effects: `shadow-`, `opacity-`
-8. Transitions: `transition-`, `duration-`
+2. Ukuran: `w-`, `h-`, `min-w-`, `max-w-`
+3. Spasi: `p-`, `m-`, `gap-`
+4. Tipografi: `text-`, `font-`, `leading-`
+5. Background: `bg-`
+6. Border: `border-`, `rounded-`
+7. Efek: `shadow-`, `opacity-`
+8. Transisi: `transition-`, `duration-`
 9. Responsive: `sm:`, `md:`, `lg:`
 10. State: `hover:`, `focus:`, `active:`
 11. Dark mode: `dark:`
 
 ---
 
-## SSR Compatibility
+## Aturan SSR
 
-### Rules
+Semua kode harus bisa berjalan di server dan client, kecuali yang secara eksplisit ditandai. Ini penting karena Nuxt secara default menggunakan SSR — halaman di-render di server terlebih dahulu.
 
-All code must work on both server and client unless explicitly marked.
+### Aturan
 
 ```typescript
-// GOOD: Check environment
+// BENAR: Cek environment
 if (import.meta.client) {
   localStorage.setItem('theme', 'dark')
 }
 
-// GOOD: Use ClientOnly wrapper
+// BENAR: Gunakan wrapper ClientOnly
 <ClientOnly>
   <BrowserOnlyComponent />
 </ClientOnly>
 
-// BAD: Direct browser API usage (breaks SSR)
+// SALAH: Penggunaan browser API langsung (merusak SSR)
 localStorage.setItem('theme', 'dark')
 window.addEventListener('scroll', handler)
 ```
 
-### Common Patterns
+### Pola Umum
 
 ```typescript
-// Use useState for hydration-safe shared state
+// Gunakan useState untuk shared state yang aman saat hydration
 const theme = useState('theme', () => 'light')
 
-// Use useCookie for cookie access (works on both server/client)
+// Gunakan useCookie untuk akses cookie (berfungsi di server dan client)
 const token = useCookie('auth_token')
 
-// Use useHead/useSeoMeta for head management
-useHead({ title: 'My Page' })
+// Gunakan useHead/useSeoMeta untuk pengelolaan head
+useHead({ title: 'Halaman Saya' })
 ```
 
 ---
 
-## Data Fetching
+## Aturan Data Fetching
 
-### In Pages/Components
+Nuxt menyediakan composable khusus untuk mengambil data yang bekerja baik di SSR maupun client. Memilih composable yang tepat memastikan data tersedia saat halaman pertama kali di-render di server.
+
+### Di Halaman/Komponen
 
 ```vue
 <script setup lang="ts">
-// SSR data fetching -- await blocks navigation until data is ready
+// SSR data fetching — await memblokir navigasi sampai data siap
 const { data, pending, error } = await useFetch('/api/users')
 
-// Lazy fetch -- does not block navigation
+// Lazy fetch — tidak memblokir navigasi
 const { data, pending } = useLazyFetch('/api/products')
 
-// With options
+// Dengan options
 const { data } = await useFetch('/api/users', {
   key: 'users-list',
   query: { page: 1 },
@@ -884,24 +927,26 @@ const { data } = await useFetch('/api/users', {
 </script>
 ```
 
-### In Stores/Functions
+### Di Store/Functions
 
 ```typescript
-// Use $fetch (not useFetch) outside of setup context
+// Gunakan $fetch (bukan useFetch) di luar konteks setup
 const data = await $fetch('/api/users')
 ```
 
-### Rules
+### Aturan
 
-- Use `useFetch()` or `useAsyncData()` in pages and components.
-- Use `$fetch()` in stores, event handlers, and non-setup contexts.
-- Never use `fetch()` or `axios` directly.
-- Always provide a `key` for cacheable requests.
-- Use `useLazyFetch()` when the data is not needed for initial render.
+- Gunakan `useFetch()` atau `useAsyncData()` di halaman dan komponen.
+- Gunakan `$fetch()` di store, event handler, dan konteks non-setup.
+- Jangan gunakan `fetch()` atau `axios` secara langsung.
+- Selalu sediakan `key` untuk request yang bisa di-cache.
+- Gunakan `useLazyFetch()` ketika data tidak dibutuhkan untuk render awal.
 
 ---
 
-## Error Handling
+## Aturan Error Handling
+
+Penanganan error yang baik membuat aplikasi lebih robust dan memberikan feedback yang jelas kepada pengguna saat terjadi kesalahan, baik di sisi client maupun server.
 
 ### Client-Side
 
@@ -928,7 +973,7 @@ export default defineEventHandler(async (event) => {
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'User ID is required',
+      statusMessage: 'User ID wajib diisi',
     })
   }
 
@@ -937,7 +982,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'User not found',
+      statusMessage: 'User tidak ditemukan',
     })
   }
 
@@ -945,13 +990,15 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-### Global Error Page
+### Halaman Error Global
 
-The `app/error.vue` file handles all unhandled errors. Use `clearError()` to recover.
+File `app/error.vue` menangani semua error yang tidak tertangani. Gunakan `clearError()` untuk recovery.
 
 ---
 
-## Testing Standards
+## Aturan Testing
+
+Testing memastikan fitur bekerja sesuai harapan dan tidak rusak saat ada perubahan kode. Template ini menggunakan Vitest untuk unit test dan Playwright untuk end-to-end test.
 
 ### Unit Tests (Vitest)
 
@@ -960,12 +1007,12 @@ import { describe, it, expect } from 'vitest'
 import { useCounter } from '~/app/composables/useCounter'
 
 describe('useCounter', () => {
-  it('starts with initial value', () => {
+  it('dimulai dengan nilai awal', () => {
     const { count } = useCounter(5)
     expect(count.value).toBe(5)
   })
 
-  it('increments count', () => {
+  it('menaikkan count', () => {
     const { count, increment } = useCounter()
     increment()
     expect(count.value).toBe(1)
@@ -978,103 +1025,109 @@ describe('useCounter', () => {
 ```typescript
 import { test, expect } from '@playwright/test'
 
-test('home page loads', async ({ page }) => {
+test('halaman utama bisa dimuat', async ({ page }) => {
   await page.goto('/')
   await expect(page.locator('h1')).toBeVisible()
 })
 ```
 
-### Test File Naming
+### Penamaan File Test
 
-- Unit: `test/unit/**/*.spec.ts` or `test/unit/**/*.test.ts`
+- Unit: `test/unit/**/*.spec.ts` atau `test/unit/**/*.test.ts`
 - E2E: `test/e2e/**/*.spec.ts`
 
-### Coverage Requirements
+### Target Coverage
 
-- Overall: 80% minimum
-- Critical paths (auth, payments): 100%
-- API endpoints: 90%
-- Components: 75%
+| Jenis          | Coverage Minimum |
+| -------------- | ---------------- |
+| Overall        | 80%              |
+| Critical paths | 100%             |
+| API endpoints  | 90%              |
+| Komponen       | 75%              |
 
 ---
 
-## Git Workflow
+## Aturan Git Workflow
 
-### Branch Naming
+Konsistensi dalam penamaan branch dan format commit message membuat history Git lebih mudah dibaca dan memungkinkan otomasi seperti changelog generation.
+
+### Penamaan Branch
 
 ```
-feature/user-authentication       # New features
-fix/login-error                   # Bug fixes
-refactor/api-structure            # Code refactoring
-hotfix/security-patch             # Urgent production fixes
-docs/update-readme                # Documentation
-chore/update-deps                 # Dependency updates
+feature/user-authentication       # Fitur baru
+fix/login-error                   # Bug fix
+refactor/api-structure            # Refactoring kode
+hotfix/security-patch             # Fix urgent production
+docs/update-readme                # Dokumentasi
+chore/update-deps                 # Update dependencies
 ```
 
 ### Commit Messages
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/). This is enforced by commitlint via Husky's `commit-msg` hook.
+Mengikuti [Conventional Commits](https://www.conventionalcommits.org/). Ini di-enforce oleh commitlint via hook `commit-msg` Husky.
 
 ```
-feat: add user authentication flow
-fix: resolve login redirect loop
-refactor: simplify API response format
-docs: update RULES.md with store guidelines
-test: add unit tests for useCounter
-chore: upgrade Nuxt to v4.2
-perf: lazy load dashboard charts
-ci: add type-check step to CI pipeline
-style: fix button alignment on mobile
-build: update Docker configuration
-revert: revert "feat: add user authentication flow"
+feat: tambah flow autentikasi user
+fix: perbaiki loop redirect login
+refactor: sederhanakan format response API
+docs: update RULES.md dengan panduan store
+test: tambah unit test untuk useCounter
+chore: upgrade Nuxt ke v4.2
+perf: lazy load chart dashboard
+ci: tambah step type-check di CI pipeline
+style: perbaiki alignment tombol di mobile
+build: update konfigurasi Docker
+revert: revert "feat: tambah flow autentikasi user"
 ```
 
-Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+Type yang diizinkan: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
 
 ### Git Hooks (Husky)
 
-Git hooks run automatically on every commit:
+Git hooks berjalan otomatis di setiap commit:
 
-| Hook         | Action                         | Tool        |
-| ------------ | ------------------------------ | ----------- |
-| `pre-commit` | Lint & format staged files     | lint-staged |
-| `commit-msg` | Validate commit message format | commitlint  |
+| Hook         | Aksi                             | Tool        |
+| ------------ | -------------------------------- | ----------- |
+| `pre-commit` | Lint & format file yang di-stage | lint-staged |
+| `commit-msg` | Validasi format commit message   | commitlint  |
 
-**pre-commit** runs `lint-staged`, which:
+**pre-commit** menjalankan `lint-staged`, yang:
 
-- Runs `eslint --fix` + `prettier --write` on staged `*.{js,ts,vue}` files.
-- Runs `prettier --write` on staged `*.{json,md,yml,yaml}` files.
+- Menjalankan `eslint --fix` + `prettier --write` pada file `*.{js,ts,vue}` yang di-stage.
+- Menjalankan `prettier --write` pada file `*.{json,md,yml,yaml}` yang di-stage.
 
-**commit-msg** validates that the commit message follows Conventional Commits format.
+**commit-msg** memvalidasi bahwa commit message mengikuti format Conventional Commits.
 
-### Before Committing
+### Sebelum Commit
 
-The hooks handle lint and format automatically, but you can also run checks manually:
+Hooks menangani lint dan format secara otomatis, tapi kamu juga bisa menjalankan pengecekan secara manual:
 
 ```bash
-pnpm run lint:fix     # Fix lint errors
-pnpm run format       # Format code
-pnpm run type-check   # Verify types
-pnpm run test:run     # Run unit tests
+pnpm run lint:fix     # Fix error lint
+pnpm run format       # Format kode
+pnpm run type-check   # Verifikasi types
+pnpm run test:run     # Jalankan unit tests
 ```
 
 ---
 
-## Performance Guidelines
+## Aturan Performa
 
-### Lazy Loading Components
+Performa yang baik dimulai dari kebiasaan coding yang tepat. Berikut aturan-aturan yang membantu menjaga aplikasi tetap cepat, terutama saat project berkembang.
+
+### Lazy Loading Komponen
 
 ```vue
 <script setup lang="ts">
-// Lazy load heavy components
+// Lazy load komponen berat
 const Chart = defineAsyncComponent(() => import('~/app/components/features/Chart.vue'))
 </script>
 ```
 
-### Image Optimization
+### Optimasi Gambar
 
 ```vue
-<!-- Use NuxtImg for optimized images -->
+<!-- Gunakan NuxtImg untuk gambar yang teroptimasi -->
 <NuxtImg src="/images/hero.jpg" width="800" height="600" loading="lazy" format="webp" />
 ```
 
@@ -1084,45 +1137,47 @@ const Chart = defineAsyncComponent(() => import('~/app/components/features/Chart
 // nuxt.config.ts
 export default defineNuxtConfig({
   routeRules: {
-    '/': { isr: 3600 }, // ISR: revalidate every hour
-    '/api/products': { isr: 60 }, // ISR: revalidate every minute
-    '/admin/**': { ssr: true }, // Always SSR
-    '/static/**': { prerender: true }, // Pre-render at build time
+    '/': { isr: 3600 }, // ISR: revalidasi setiap jam
+    '/api/products': { isr: 60 }, // ISR: revalidasi setiap menit
+    '/admin/**': { ssr: true }, // Selalu SSR
+    '/static/**': { prerender: true }, // Pre-render saat build
   },
 })
 ```
 
 ---
 
-## Security Guidelines
+## Aturan Keamanan
 
-- Never commit secrets or API keys -- use `.env` and `runtimeConfig`.
-- Always validate user input on the server side.
-- Use `createError()` for error responses (prevents leaking internal details).
-- Apply security headers via server middleware.
-- Sanitize HTML if using `v-html` (use DOMPurify).
-- Use `readonly()` for refs that should not be mutated externally.
+Keamanan adalah aspek yang harus diperhatikan sejak awal development, bukan ditambahkan belakangan. Berikut aturan-aturan dasar untuk menjaga aplikasi tetap aman.
+
+- Jangan commit secrets atau API keys — gunakan `.env` dan `runtimeConfig`.
+- Selalu validasi input pengguna di sisi server.
+- Gunakan `createError()` untuk response error (mencegah kebocoran detail internal).
+- Terapkan security headers via server middleware.
+- Sanitasi HTML jika menggunakan `v-html` (gunakan DOMPurify).
+- Gunakan `readonly()` untuk refs yang tidak boleh dimutasi dari luar.
 
 ---
 
-## Quick Reference
+## Referensi Cepat
 
-### Essential Commands
+### Perintah Penting
 
 ```bash
-pnpm dev              # Start dev server
-pnpm build            # Build for production
-pnpm preview          # Preview production build
-pnpm run lint         # Run linter
-pnpm run lint:fix     # Auto-fix lint errors
-pnpm run format       # Format code
-pnpm run type-check   # TypeScript check
-pnpm run test         # Run unit tests (watch mode)
-pnpm run test:run     # Run unit tests (single run)
-pnpm run test:e2e     # Run E2E tests
+pnpm dev              # Jalankan dev server
+pnpm build            # Build untuk production
+pnpm preview          # Preview build production
+pnpm run lint         # Jalankan linter
+pnpm run lint:fix     # Auto-fix error lint
+pnpm run format       # Format kode
+pnpm run type-check   # Cek TypeScript
+pnpm run test         # Jalankan unit tests (watch mode)
+pnpm run test:run     # Jalankan unit tests (sekali)
+pnpm run test:e2e     # Jalankan E2E tests
 ```
 
-### Auto-Imported APIs (No import needed)
+### API yang Di-Auto-Import (Tanpa import)
 
 ```typescript
 // Vue
@@ -1139,5 +1194,5 @@ defineNuxtRouteMiddleware
 
 // VueUse (via @vueuse/nuxt)
 useLocalStorage, useSessionStorage, useDark, useToggle,
-useClipboard, useMediaQuery, useWindowSize, etc.
+useClipboard, useMediaQuery, useWindowSize, dll.
 ```
