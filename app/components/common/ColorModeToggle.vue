@@ -8,8 +8,8 @@ const icons = {
 }
 
 const color = computed(() => {
-  if (colorMode.value === 'light') return 'amber'
-  if (colorMode.value === 'dark') return 'sky'
+  if (colorMode.value === 'light') return 'warning'
+  if (colorMode.value === 'dark') return 'primary'
   return 'neutral'
 })
 
@@ -31,7 +31,7 @@ const cycleColorMode = () => {
 <template>
   <UButton
     :icon="currentIcon"
-    :color="color as any"
+    :color="color"
     variant="ghost"
     aria-label="Toggle color mode"
     @click="cycleColorMode"

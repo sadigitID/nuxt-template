@@ -14,7 +14,7 @@
         </NuxtLink>
 
         <div class="flex items-center gap-2">
-          <UVerticalNavigation :links="navigationLinks" class="hidden md:flex" />
+          <UNavigationMenu :items="navigationLinks" class="hidden md:flex" />
 
           <div class="flex items-center gap-1">
             <UButton
@@ -80,7 +80,9 @@
 </template>
 
 <script setup lang="ts">
-const navigationLinks = [
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const navigationLinks = ref<NavigationMenuItem[]>([
   {
     label: 'Home',
     icon: 'i-heroicons-home',
@@ -91,5 +93,5 @@ const navigationLinks = [
     icon: 'i-heroicons-information-circle',
     to: '/about',
   },
-]
+])
 </script>
