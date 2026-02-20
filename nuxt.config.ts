@@ -1,9 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
   // Modules
   modules: [
-    '@nuxtjs/tailwindcss',
+    '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/icon',
     '@nuxt/image',
