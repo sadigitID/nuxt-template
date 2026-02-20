@@ -278,22 +278,23 @@ docker compose up -d
 
 Jika kamu baru mengenal Nuxt, berikut istilah-istilah penting yang akan sering ditemui:
 
-| Istilah                | Penjelasan                                                                                                            |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **SSR**                | Server-Side Rendering — halaman di-render di server sebelum dikirim ke browser, sehingga lebih cepat dan SEO-friendly |
-| **SSG**                | Static Site Generation — halaman di-generate saat build, cocok untuk konten yang jarang berubah                       |
-| **Nitro**              | Engine server bawaan Nuxt yang menangani API routes, middleware, dan rendering di sisi server                         |
-| **Auto-import**        | Fitur Nuxt yang otomatis mengimpor komponen, composable, dan utilitas tanpa perlu menulis `import` manual             |
-| **File-based Routing** | Setiap file `.vue` di `app/pages/` otomatis menjadi route — tidak perlu konfigurasi router manual                     |
-| **Composable**         | Fungsi reusable yang menggunakan Vue Composition API (prefix `use`), misalnya `useAuth()`, `useFetch()`               |
-| **Layout**             | Komponen pembungkus halaman (header, footer, sidebar) yang bisa dipakai ulang di berbagai halaman                     |
-| **Middleware**         | Fungsi yang berjalan sebelum navigasi ke halaman tertentu, biasanya untuk pengecekan autentikasi                      |
-| **Plugin**             | Kode yang dijalankan saat aplikasi diinisialisasi, untuk mendaftarkan library atau konfigurasi global                 |
-| **`useFetch`**         | Composable bawaan Nuxt untuk mengambil data dari API — otomatis bekerja di SSR dan client                             |
-| **`$fetch`**           | Fungsi fetch bawaan Nuxt (berbasis `ofetch`), digunakan di dalam store atau event handler (bukan di `<script setup>`) |
-| **Runtime Config**     | Cara Nuxt mengelola environment variable — yang ber-prefix `NUXT_PUBLIC_` bisa diakses client, sisanya hanya server   |
-| **`app/` directory**   | Struktur direktori baru di Nuxt 4 yang memisahkan kode aplikasi dari konfigurasi root project                         |
-| **`shared/`**          | Folder untuk kode yang dipakai bersama antara `app/` (client) dan `server/`                                           |
+| Istilah                | Penjelasan                                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **SSR**                | Server-Side Rendering — halaman di-render di server sebelum dikirim ke browser, sehingga lebih cepat dan SEO-friendly               |
+| **SSG**                | Static Site Generation — halaman di-generate saat build, cocok untuk konten yang jarang berubah                                     |
+| **Nitro**              | Engine server bawaan Nuxt yang menangani API routes, middleware, dan rendering di sisi server                                       |
+| **Auto-import**        | Fitur Nuxt yang otomatis mengimpor komponen, composable, dan utilitas tanpa perlu menulis `import` manual                           |
+| **File-based Routing** | Setiap file `.vue` di `app/pages/` otomatis menjadi route — tidak perlu konfigurasi router manual                                   |
+| **Composable**         | Fungsi reusable yang menggunakan Vue Composition API (prefix `use`), misalnya `useAuth()`, `useFetch()`                             |
+| **Layout**             | Komponen pembungkus halaman (header, footer, sidebar) yang bisa dipakai ulang di berbagai halaman                                   |
+| **Middleware**         | Fungsi yang berjalan sebelum navigasi ke halaman tertentu, biasanya untuk pengecekan autentikasi                                    |
+| **Plugin**             | Kode yang dijalankan saat aplikasi diinisialisasi, untuk mendaftarkan library atau konfigurasi global                               |
+| **`useApi`**           | Custom composable untuk API calls dengan automatic auth, error handling, dan redirect 401 — wrapper cerdas atas `useFetch`/`$fetch` |
+| **`useFetch`**         | Composable bawaan Nuxt untuk mengambil data dari API — otomatis bekerja di SSR dan client                                           |
+| **`$fetch`**           | Fungsi fetch bawaan Nuxt (berbasis `ofetch`), digunakan di dalam store atau event handler (bukan di `<script setup>`)               |
+| **Runtime Config**     | Cara Nuxt mengelola environment variable — yang ber-prefix `NUXT_PUBLIC_` bisa diakses client, sisanya hanya server                 |
+| **`app/` directory**   | Struktur direktori baru di Nuxt 4 yang memisahkan kode aplikasi dari konfigurasi root project                                       |
+| **`shared/`**          | Folder untuk kode yang dipakai bersama antara `app/` (client) dan `server/`                                                         |
 
 ## Sebelum Commit
 

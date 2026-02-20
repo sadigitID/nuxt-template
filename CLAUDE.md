@@ -119,30 +119,44 @@ export const useCounter = (initialValue = 0) => {
 
 ### Server-Side Data Fetching
 
+Project ini menyediakan custom composable `useApi` untuk semua pemanggilan API internal. `useApi` menggabungkan `useFetch` dan `$fetch` dengan automatic authentication, error handling, dan redirect 401.
+
 ```vue
-<!-- ✅ GOOD: Use useFetch or useAsyncData in pages -->
+<!-- ✅ GOOD: Use useApi for API calls -->
 <script setup lang="ts">
-// For API calls
-const { data: users, pending, error } = await useFetch('/api/users')
+// GET request - SSR data fetching
+const { data: users, pending, error } = await useApi('/api/users')
 
-// For any async operation
-const { data: time } = await useAsyncData('time', () => $fetch('/api/time'))
-
-// With parameters
-const { data: user } = await useFetch(`/api/users/${route.params.id}`, {
-  key: `user-${route.params.id}`, // Unique key for caching
-  watch: [() => route.params.id], // Refetch when param changes
+// POST request - mutation (immediate: false)
+const { data, execute } = useApi('/api/users', {
+  method: 'POST',
+  body: { name: 'John', email: 'john@example.com' },
 })
+
+// Trigger manual
+await execute()
 </script>
 
 <template>
   <div v-if="pending">Loading...</div>
   <div v-else-if="error">Error: {{ error.message }}</div>
   <ul v-else>
-    <li v-for="user in users" :key="user.id">{{ user.name }}</li>
+    <li v-for="user in users?.data" :key="user.id">{{ user.name }}</li>
   </ul>
 </template>
 ```
+
+**Properties:**
+
+- `data` - Response data (`Ref<ApiResponse<T> | null>`)
+- `error` - Error dengan `message` property (`Ref<ApiErrorResponse | null>`)
+- `pending` - Loading state
+- `status` - Request status: `'idle' | 'pending' | 'success' | 'error'`
+- `execute` - Trigger manual request
+- `refresh` - Re-fetch data
+- `clear` - Reset state
+
+**Catatan:** Gunakan `useFetch` atau `useAsyncData` langsung hanya untuk kasus khusus yang tidak tercover oleh `useApi`.
 
 ### API Routes (server/api/)
 
@@ -594,8 +608,14 @@ onMounted(async () => {
   const data = await fetch('/api/users')  // Wrong!
 })
 
-// ✅ GOOD: Use useFetch or useAsyncData
+// ❌ BAD: Direct useFetch without auth/error handling wrapper
 const { data } = await useFetch('/api/users')
+
+// ✅ GOOD: Use useApi for internal API calls
+const { data } = await useApi('/api/users')
+
+// ✅ GOOD: Use useFetch/useAsyncData for special cases only
+const { data } = await useAsyncData('time', () => $fetch('/api/time'))
 ```
 
 ## Code Review Checklist
@@ -610,7 +630,7 @@ Before approving code, verify:
 - [ ] Environment variables use runtime config
 - [ ] No hardcoded values or secrets
 - [ ] Components use `<script setup lang="ts">`
-- [ ] Proper use of `useFetch`/`useAsyncData` for data fetching
+- [ ] Use `useApi` for internal API calls, `useFetch`/`useAsyncData` only for special cases
 - [ ] Tests added/updated (80%+ coverage)
 - [ ] No `console.log` statements
 - [ ] ESLint passes without warnings

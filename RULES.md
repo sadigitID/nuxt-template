@@ -7,7 +7,8 @@ Dokumen ini mendefinisikan standar coding, konvensi penamaan, struktur file, dan
 > - **SSR (Server-Side Rendering):** Halaman di-render di server sebelum dikirim ke browser, sehingga lebih cepat untuk pengguna dan lebih mudah diindeks mesin pencari.
 > - **Auto-import:** Fitur Nuxt yang secara otomatis menyediakan komponen, composable, dan utilitas tanpa perlu menulis `import` manual di setiap file.
 > - **Composable:** Fungsi reusable yang menggunakan Vue Composition API (selalu diawali prefix `use`), misalnya `useAuth()`, `useCounter()`.
-> - **`useFetch` vs `$fetch`:** `useFetch()` digunakan di `<script setup>` untuk mengambil data (SSR-compatible). `$fetch()` digunakan di dalam store, event handler, atau konteks non-setup.
+> - **`useApi`:** Custom composable wrapper untuk `useFetch`/`$fetch` dengan automatic authentication via cookies, error handling yang konsisten, dan redirect otomatis ke login saat 401. Gunakan `useApi` untuk semua pemanggilan API internal.
+> - **`useFetch` vs `$fetch`:** `useFetch()` digunakan di `<script setup>` untuk mengambil data (SSR-compatible). `$fetch()` digunakan di dalam store, event handler, atau konteks non-setup. **Catatan:** Untuk project ini, gunakan `useApi` sebagai pengganti keduanya.
 > - **`definePageMeta`:** Macro Nuxt untuk mendefinisikan metadata halaman (layout, middleware) di dalam `<script setup>`.
 > - **Nitro:** Engine server bawaan Nuxt yang menangani API routes (`server/api/`), middleware, dan rendering di sisi server.
 > - **File-based Routing:** Setiap file `.vue` di `app/pages/` otomatis menjadi route — tidak perlu konfigurasi router manual.
@@ -397,8 +398,8 @@ const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
 
-// 7. Data fetching
-const { data, pending, error } = await useFetch('/api/users')
+// 7. Data fetching (gunakan useApi untuk API calls)
+const { data, pending, error } = await useApi('/api/users')
 
 // 8. Reactive state
 const isOpen = ref(false)
@@ -635,12 +636,17 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Actions (functions)
   async function login(credentials: LoginCredentials): Promise<void> {
-    const response = await $fetch('/api/auth/login', {
+    const { data, error } = await useApi('/api/auth/login', {
       method: 'POST',
       body: credentials,
     })
-    user.value = response.user
-    token.value = response.token
+
+    if (error.value) {
+      throw new Error(error.value.message)
+    }
+
+    user.value = data.value?.data?.user
+    token.value = data.value?.data?.token
   }
 
   function logout(): void {
@@ -666,7 +672,7 @@ Aturan:
 - Nama store di `defineStore('nama')` harus sesuai nama file.
 - Export fungsi store dengan prefix `use` dan suffix `Store`: `useAuthStore`.
 - Return `readonly()` untuk state yang hanya boleh diubah via actions.
-- Gunakan `$fetch` (bukan `useFetch`) di dalam store actions.
+- Gunakan `useApi` untuk pemanggilan API di dalam store actions.
 
 ---
 
@@ -906,41 +912,110 @@ useHead({ title: 'Halaman Saya' })
 
 ## Aturan Data Fetching
 
-Nuxt menyediakan composable khusus untuk mengambil data yang bekerja baik di SSR maupun client. Memilih composable yang tepat memastikan data tersedia saat halaman pertama kali di-render di server.
+Project ini menyediakan custom composable `useApi` yang menggabungkan `useFetch` dan `$fetch` dengan automatic authentication, error handling, dan redirect 401. Gunakan `useApi` untuk semua pemanggilan API internal.
+
+### useApi - Composable Utama
+
+`useApi` adalah wrapper yang cerdas:
+
+- Otomatis menggunakan `useFetch` untuk SSR/initial hydration
+- Otomatis menggunakan `$fetch` untuk mutations dan client-side requests
+- Mengirim cookies otomatis untuk authentication
+- Redirect ke `/auth/login` saat 401 (kecuali halaman publik)
+- Error handling konsisten dengan `error.value.message`
 
 ### Di Halaman/Komponen
 
 ```vue
 <script setup lang="ts">
-// SSR data fetching — await memblokir navigasi sampai data siap
-const { data, pending, error } = await useFetch('/api/users')
+// GET request - SSR data fetching
+const { data, pending, error, status } = await useApi('/api/users')
 
-// Lazy fetch — tidak memblokir navigasi
-const { data, pending } = useLazyFetch('/api/products')
+// Dengan destructuring - await memblokir sampai data siap
+const { data: users } = await useApi('/api/users')
 
-// Dengan options
-const { data } = await useFetch('/api/users', {
-  key: 'users-list',
-  query: { page: 1 },
-  transform: (data) => data.map(transformUser),
+// POST request - mutation (immediate: false)
+const { data, error, execute } = useApi('/api/users', {
+  method: 'POST',
+  body: { name: 'John', email: 'john@example.com' },
 })
+
+// Trigger manual
+await execute()
 </script>
+
+<template>
+  <div v-if="pending">Loading...</div>
+  <div v-else-if="error">Error: {{ error.message }}</div>
+  <ul v-else>
+    <li v-for="user in data?.data" :key="user.id">{{ user.name }}</li>
+  </ul>
+</template>
 ```
 
 ### Di Store/Functions
 
 ```typescript
-// Gunakan $fetch (bukan useFetch) di luar konteks setup
-const data = await $fetch('/api/users')
+// useApi juga bekerja di store
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<User | null>(null)
+
+  async function login(credentials: LoginCredentials) {
+    // Gunakan useApi untuk konsistensi
+    const { data, error } = await useApi('/api/auth/login', {
+      method: 'POST',
+      body: credentials,
+    })
+
+    if (error.value) {
+      throw new Error(error.value.message)
+    }
+
+    user.value = data.value?.data
+  }
+
+  return { user, login }
+})
 ```
+
+### API Response Format
+
+API harus mengembalikan response dengan format standar:
+
+```typescript
+// Success response
+{
+  success: true,
+  data: { ... },
+  message?: string
+}
+
+// Error response (diset ke error.value)
+{
+  success: false,
+  message: 'Error message here'
+}
+```
+
+### Available Properties
+
+| Property  | Type                                               | Deskripsi                       |
+| --------- | -------------------------------------------------- | ------------------------------- |
+| `data`    | `Ref<ApiResponse<T> \| null>`                      | Response data                   |
+| `error`   | `Ref<ApiErrorResponse \| null>`                    | Error dengan `message` property |
+| `pending` | `Ref<boolean>`                                     | Loading state                   |
+| `status`  | `Ref<'idle' \| 'pending' \| 'success' \| 'error'>` | Request status                  |
+| `execute` | `() => Promise`                                    | Trigger manual request          |
+| `refresh` | `() => Promise`                                    | Re-fetch data                   |
+| `clear`   | `() => void`                                       | Reset state                     |
 
 ### Aturan
 
-- Gunakan `useFetch()` atau `useAsyncData()` di halaman dan komponen.
-- Gunakan `$fetch()` di store, event handler, dan konteks non-setup.
+- Gunakan `useApi()` untuk semua pemanggilan API internal.
+- Gunakan `immediate: false` untuk mutations (POST/PUT/PATCH/DELETE).
+- Akses pesan error via `error.value?.message`.
 - Jangan gunakan `fetch()` atau `axios` secara langsung.
-- Selalu sediakan `key` untuk request yang bisa di-cache.
-- Gunakan `useLazyFetch()` ketika data tidak dibutuhkan untuk render awal.
+- Untuk API eksternal (third-party), gunakan `$fetch` langsung.
 
 ---
 
@@ -1187,6 +1262,7 @@ defineProps, defineEmits, withDefaults
 
 // Nuxt
 useRoute, useRouter, useFetch, useAsyncData, useLazyFetch,
+useApi, // Custom composable untuk API calls dengan auth & error handling
 useRuntimeConfig, useState, useCookie, useHead, useSeoMeta,
 useNuxtApp, useAppConfig, useError, clearError,
 navigateTo, createError, definePageMeta,
