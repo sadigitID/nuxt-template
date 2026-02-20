@@ -2,7 +2,7 @@
 export default defineAppConfig({
   // Application metadata (accessible via useAppConfig())
   ui: {
-    primaryColor: 'blue',
-    grayColor: 'neutral',
+    primary: 'blue',
+    gray: 'slate',
   },
 })

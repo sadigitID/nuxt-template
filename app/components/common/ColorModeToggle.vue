@@ -1,19 +1,39 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 
-const toggleColorMode = (): void => {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+const icons = {
+  light: 'i-heroicons-sun-20-solid',
+  dark: 'i-heroicons-moon-20-solid',
+  system: 'i-heroicons-computer-desktop-20-solid',
+}
+
+const color = computed(() => {
+  if (colorMode.value === 'light') return 'amber'
+  if (colorMode.value === 'dark') return 'sky'
+  return 'neutral'
+})
+
+const currentIcon = computed(() => {
+  return icons[colorMode.value as keyof typeof icons] || icons.system
+})
+
+const cycleColorMode = () => {
+  if (colorMode.value === 'light') {
+    colorMode.preference = 'dark'
+  } else if (colorMode.value === 'dark') {
+    colorMode.preference = 'system'
+  } else {
+    colorMode.preference = 'light'
+  }
 }
 </script>
 
 <template>
-  <button
-    type="button"
-    class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition-colors"
+  <UButton
+    :icon="currentIcon"
+    :color="color as any"
+    variant="ghost"
     aria-label="Toggle color mode"
-    @click="toggleColorMode"
-  >
-    <Icon v-if="colorMode.value === 'dark'" name="lucide:sun" class="size-5" />
-    <Icon v-else name="lucide:moon" class="size-5" />
-  </button>
+    @click="cycleColorMode"
+  />
 </template>
