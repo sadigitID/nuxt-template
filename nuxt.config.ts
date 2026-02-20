@@ -112,10 +112,4 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ['./app/stores/**'],
   },
-
-  // Tailwind CSS
-  tailwindcss: {
-    exposeConfig: false,
-    viewer: false,
-  },
 })
