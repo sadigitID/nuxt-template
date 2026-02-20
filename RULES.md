@@ -141,12 +141,11 @@ Komponen diorganisir dalam subdirektori berdasarkan kategori. Nama direktori men
 
 ```
 app/components/
-├── common/                       # Komponen reusable
-│   ├── Button.vue                # -> <CommonButton />
-│   ├── Modal.vue                 # -> <CommonModal />
-│   ├── Input.vue                 # -> <CommonInput />
+├── common/                       # Komponen reusable domain-specific
 │   ├── ColorModeToggle.vue       # -> <CommonColorModeToggle />
-│   └── DataTable.vue             # -> <CommonDataTable />
+│   ├── UserAvatar.vue            # -> <CommonUserAvatar />
+│   ├── ProductCard.vue           # -> <CommonProductCard />
+│   └── SearchFilter.vue          # -> <CommonSearchFilter />
 ├── features/                     # Komponen spesifik fitur
 │   ├── UserCard.vue              # -> <FeaturesUserCard />
 │   ├── ProductList.vue           # -> <FeaturesProductList />
@@ -161,6 +160,7 @@ Aturan:
 
 - Selalu gunakan `PascalCase` untuk file komponen.
 - Kelompokkan berdasarkan fungsi: `common/` untuk reusable, `features/` untuk domain-specific.
+- **Jangan** membuat komponen yang duplikat dengan NuxtUI (Button, Input, Modal, Card, Table, Badge, dll).
 - Nama komponen harus berupa kata benda (noun) atau frasa kata benda.
 - Hindari nama generik seperti `Item.vue` atau `List.vue` tanpa konteks.
 
@@ -828,20 +828,152 @@ import { formatDate } from '~/app/utils/format'
 
 ---
 
+## Aturan NuxtUI Components
+
+NuxtUI adalah library UI utama yang menyediakan komponen siap pakai. Semua komponen NuxtUI di-auto-import dengan prefix `U` dan tidak perlu import manual.
+
+### Prioritas Penggunaan Komponen
+
+1. **NuxtUI Components** — Gunakan komponen NuxtUI (`UButton`, `UInput`, dll) untuk UI umum
+2. **Custom Components** — Buat komponen custom hanya untuk kasus spesifik domain yang tidak tercover NuxtUI
+3. **Tailwind Classes** — Gunakan Tailwind langsung untuk styling kecil/modifikasi
+
+### Komponen NuxtUI yang Umum
+
+```vue
+<template>
+  <!-- Button dengan berbagai variant -->
+  <UButton variant="solid">Solid</UButton>
+  <UButton variant="soft">Soft</UButton>
+  <UButton variant="outline">Outline</UButton>
+  <UButton variant="ghost">Ghost</UButton>
+  <UButton variant="link">Link</UButton>
+
+  <!-- Button dengan icon -->
+  <UButton icon="i-heroicons-pencil-square">Edit</UButton>
+  <UButton leading-icon="i-heroicons-magnifying-glass" trailing-icon="i-heroicons-chevron-down">
+    Search
+  </UButton>
+
+  <!-- Input -->
+  <UInput v-model="search" placeholder="Cari..." />
+  <UInput v-model="email" type="email" icon="i-heroicons-envelope" placeholder="Email" size="lg" />
+
+  <!-- Form dengan validation -->
+  <UForm :state="state" @submit="submit">
+    <UFormGroup label="Name" name="name">
+      <UInput v-model="state.name" />
+    </UFormGroup>
+    <UButton type="submit">Save</UButton>
+  </UForm>
+
+  <!-- Card -->
+  <UCard>
+    <template #header>
+      <h3>Card Header</h3>
+    </template>
+    <p>Card content</p>
+    <template #footer>
+      <UButton>Footer Action</UButton>
+    </template>
+  </UCard>
+
+  <!-- Modal -->
+  <UModal v-model="isOpen">
+    <UCard>
+      <template #header>
+        <h3>Modal Title</h3>
+      </template>
+      <p>Modal content</p>
+    </UCard>
+  </UModal>
+
+  <!-- Table -->
+  <UTable :rows="rows" :columns="columns" />
+
+  <!-- Badge -->
+  <UBadge>Default</UBadge>
+  <UBadge variant="solid">Solid</UBadge>
+  <UBadge color="green">Success</UBadge>
+
+  <!-- Dropdown -->
+  <UDropdown :items="items">
+    <UButton>Menu</UButton>
+  </UDropdown>
+
+  <!-- Tooltip -->
+  <UTooltip text="Tooltip text">
+    <UButton>Hover me</UButton>
+  </UTooltip>
+</template>
+```
+
+### Icon Naming Convention
+
+NuxtUI menggunakan format `i-{set}-{icon}` untuk icon class:
+
+```vue
+<template>
+  <!-- Heroicons (default) -->
+  <UButton icon="i-heroicons-home" />
+  <Icon name="i-heroicons-user" />
+
+  <!-- Iconify sets lain -->
+  <UInput icon="i-lucide-search" />
+  <Icon name="i-simple-icons-github" />
+</template>
+```
+
+### Konfigurasi Tema
+
+NuxtUI menggunakan app config untuk konfigurasi tema. Edit `app.config.ts`:
+
+```typescript
+// app.config.ts
+export default defineAppConfig({
+  ui: {
+    primary: 'green',
+    gray: 'slate',
+  },
+})
+```
+
+### Aturan
+
+- Gunakan komponen NuxtUI untuk UI umum (button, input, modal, table, dll)
+- Jangan membuat komponen custom yang duplikat dengan NuxtUI
+- Gunakan `app.config.ts` untuk konfigurasi tema global, jangan inline styles
+- Prefix icon dengan `i-` untuk class-based icon (Heroicons, Lucide, dll)
+
+---
+
 ## Aturan Tailwind CSS
 
-Tailwind CSS menggunakan pendekatan utility-first: alih-alih menulis CSS kustom, kamu menyusun tampilan langsung di template menggunakan class utilitas. Ini membuat styling lebih konsisten dan mengurangi CSS yang tidak terpakai.
+Tailwind CSS menggunakan pendekatan utility-first. NuxtUI sudah menyertakan konfigurasi Tailwind, jadi gunakan utility class untuk custom styling di luar komponen NuxtUI.
 
 ### Penggunaan
 
-- Utamakan class Tailwind daripada CSS kustom.
-- Gunakan `<style scoped>` hanya jika class Tailwind tidak memadai.
-- Gunakan variant `dark:` dari Tailwind untuk style dark mode.
+- Utamakan komponen NuxtUI daripada Tailwind class mentah
+- Gunakan Tailwind class untuk modifikasi styling pada komponen NuxtUI
+- Gunakan `<style scoped>` hanya jika benar-benar diperlukan
+- Gunakan variant `dark:` untuk dark mode
 
 ```vue
-<!-- BENAR: Class Tailwind -->
+<!-- BENAR: NuxtUI component -->
 <template>
-  <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Submit</button>
+  <UButton>Submit</UButton>
+</template>
+
+<!-- BENAR: NuxtUI dengan Tailwind modifier -->
+<template>
+  <UButton class="w-full">Full Width Button</UButton>
+</template>
+
+<!-- BENAR: Custom element dengan Tailwind -->
+<template>
+  <div class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+    Custom styled content
+  </div>
 </template>
 
 <!-- HINDARI: CSS kustom untuk styling dasar -->

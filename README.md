@@ -8,7 +8,8 @@
 | -------------- | --------------------------- | --------------------------------------------- |
 | **Framework**  | `nuxt` v4                   | Nuxt 4 dengan struktur direktori `app/`       |
 | **Bahasa**     | `typescript`                | Strict mode aktif                             |
-| **Styling**    | `@nuxtjs/tailwindcss`       | Utility-first CSS framework                   |
+| **UI Kit**     | `@nuxt/ui` v4               | Komponen UI berbasis Tailwind CSS             |
+| **Styling**    | `tailwindcss` v4            | Utility-first CSS framework                   |
 | **Icons**      | `@nuxt/icon`                | 200k+ ikon via Iconify (Lucide, Simple Icons) |
 | **Images**     | `@nuxt/image`               | Optimasi gambar otomatis (avif, webp)         |
 | **Fonts**      | `@nuxt/fonts`               | Optimasi font otomatis                        |
@@ -166,15 +167,59 @@ Environment variable dengan prefix `NUXT_PUBLIC_` bisa diakses di client via `us
 
 ## Modul yang Disertakan
 
-### @nuxtjs/tailwindcss
+### @nuxt/ui (NuxtUI)
 
-Tailwind CSS sudah dikonfigurasi. Gunakan utility class langsung di template:
+NuxtUI adalah UI library utama yang menyediakan komponen siap pakai berbasis Tailwind CSS. Semua komponen di-auto-import:
+
+```vue
+<template>
+  <!-- Button component dengan variant -->
+  <UButton variant="solid">Klik saya</UButton>
+  <UButton variant="soft">Soft button</UButton>
+  <UButton variant="outline">Outline</UButton>
+
+  <!-- Input dengan icon -->
+  <UInput icon="i-heroicons-magnifying-glass" placeholder="Cari..." />
+
+  <!-- Modal -->
+  <UModal v-model="isOpen">
+    <Placeholder />
+  </UModal>
+
+  <!-- Card -->
+  <UCard>
+    <template #header>
+      <h3>Header</h3>
+    </template>
+    <p>Content</p>
+  </UCard>
+</template>
+```
+
+**Komponen Populer:**
+
+- `UButton` - Button dengan berbagai variant dan sizes
+- `UInput` - Input field dengan icon dan validation
+- `UForm` - Form handling dengan Zod validation
+- `UModal` - Modal/dialog component
+- `UCard` - Card container dengan header/footer slots
+- `UTable` - Data table dengan sorting dan pagination
+- `UBadge` - Badge/label component
+- `UDropdown` - Dropdown menu
+- `UTooltip` - Tooltip component
+- `UNotification` - Toast notifications
+
+### Tailwind CSS
+
+NuxtUI sudah termasuk konfigurasi Tailwind CSS. Gunakan utility class untuk custom styling:
 
 ```vue
 <template>
   <button class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Klik saya</button>
 </template>
 ```
+
+Gunakan variant `dark:` untuk dark mode. NuxtUI menggunakan prefix `i-` untuk icon class (Heroicons default).
 
 ### @nuxtjs/seo
 

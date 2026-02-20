@@ -53,28 +53,110 @@ When reviewing code, prioritize these aspects:
 
 ## Nuxt 4 Specific Guidelines
 
-### App Directory Usage
+### NuxtUI Components
+
+Project ini menggunakan **NuxtUI** sebagai UI library utama. Semua komponen NuxtUI di-auto-import dengan prefix `U`.
+
+```vue
+<!-- ✅ GOOD: Use NuxtUI components -->
+<template>
+  <!-- Button with variants -->
+  <UButton variant="solid">Submit</UButton>
+  <UButton variant="soft" color="green">Success</UButton>
+
+  <!-- Input with icon -->
+  <UInput v-model="search" icon="i-heroicons-magnifying-glass" placeholder="Search..." />
+
+  <!-- Form with validation -->
+  <UForm :state="state" @submit="onSubmit">
+    <UFormGroup label="Email" name="email">
+      <UInput type="email" v-model="state.email" />
+    </UFormGroup>
+    <UButton type="submit">Submit</UButton>
+  </UForm>
+
+  <!-- Card -->
+  <UCard>
+    <template #header>
+      <h3>Title</h3>
+    </template>
+    <p>Content</p>
+  </UCard>
+
+  <!-- Modal -->
+  <UModal v-model="isOpen">
+    <UCard>
+      <p>Modal content</p>
+    </UCard>
+  </UModal>
+</template>
+```
+
+**Available Components:**
+
+- `UButton`, `UInput`, `USelect`, `UTextarea`, `UCheckbox`, `URadio`
+- `UForm`, `UFormGroup` - Form with Zod validation
+- `UCard`, `UModal`, `UDropdown`, `UTooltip`, `UBadge`
+- `UTable`, `UPagination`, `UTabs`, `UAccordion`
+- `UNotification`, `UAlert`, `USkeleton`
+
+**Icon Convention:**
+
+- Use `i-{set}-{icon}` format: `i-heroicons-home`, `i-lucide-search`, `i-simple-icons-github`
+
+### Custom Components
+
+Only create custom components for domain-specific UI not covered by NuxtUI:
 
 ```typescript
-// ✅ GOOD: Place components in app/components/
-// These are auto-imported throughout the app
-// app/components/common/Button.vue
+// ✅ GOOD: Domain-specific component in app/components/
+// app/components/common/UserAvatar.vue
 
 <script setup lang="ts">
 interface Props {
-  variant?: 'primary' | 'secondary'
-  disabled?: boolean
+  user: User
+  size?: 'sm' | 'md' | 'lg'
 }
 withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  disabled: false
+  size: 'md'
 })
 </script>
 
 <template>
-  <button :class="['btn', variant]" :disabled="disabled">
-    <slot />
-  </button>
+  <div :class="['avatar', size]">
+    <img :src="user.avatar" :alt="user.name" />
+    <span>{{ user.initials }}</span>
+  </div>
+</template>
+```
+
+❌ **BAD:** Don't create components that duplicate NuxtUI (Button, Input, Modal, Card, Table, etc.)
+
+### App Directory Usage
+
+```typescript
+// ✅ GOOD: Place custom components in app/components/
+// These are auto-imported throughout the app
+// For UI components, use NuxtUI (UButton, UInput, etc.)
+
+// app/components/common/UserCard.vue - Domain-specific component
+<script setup lang="ts">
+interface Props {
+  user: User
+}
+defineProps<Props>()
+</script>
+
+<template>
+  <UCard>
+    <div class="flex items-center gap-4">
+      <img :src="user.avatar" :alt="user.name" class="size-10 rounded-full" />
+      <div>
+        <h3 class="font-medium">{{ user.name }}</h3>
+        <p class="text-sm text-gray-500">{{ user.email }}</p>
+      </div>
+    </div>
+  </UCard>
 </template>
 ```
 
@@ -594,8 +676,17 @@ describe('API Endpoints', () => {
 // ❌ BAD: Direct import of components (not needed with auto-import)
 import Button from '~/components/Button.vue'  // Wrong!
 
-// ✅ GOOD: Use auto-import
-<Button />
+// ✅ GOOD: Use auto-import (and use NuxtUI for UI components)
+<UButton>Click me</UButton>
+
+// ❌ BAD: Creating custom components that duplicate NuxtUI
+// app/components/common/Button.vue
+// Don't do this! Use <UButton> instead.
+
+// ✅ GOOD: Use NuxtUI components for UI primitives
+<UButton variant="solid">Submit</UButton>
+<UInput v-model="value" placeholder="Enter..." />
+<UModal v-model="isOpen">...</UModal>
 
 // ❌ BAD: Using Vue Router directly (use Nuxt's composables)
 import { useRouter } from 'vue-router'  // Wrong!
@@ -630,6 +721,7 @@ Before approving code, verify:
 - [ ] Environment variables use runtime config
 - [ ] No hardcoded values or secrets
 - [ ] Components use `<script setup lang="ts">`
+- [ ] NuxtUI components used instead of custom duplicates (Button, Input, Modal, etc.)
 - [ ] Use `useApi` for internal API calls, `useFetch`/`useAsyncData` only for special cases
 - [ ] Tests added/updated (80%+ coverage)
 - [ ] No `console.log` statements
@@ -638,6 +730,7 @@ Before approving code, verify:
 ## Additional Resources
 
 - [Nuxt 4 Documentation](https://nuxt.com/docs)
+- [NuxtUI Documentation](https://ui.nuxt.com/components)
 - [Nuxt 4 Migration Guide](https://nuxt.com/docs/migration/overview)
 - [Nitro Documentation](https://nitro.unjs.io/)
 - [Vue 3 Documentation](https://vuejs.org/)
