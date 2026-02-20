@@ -31,7 +31,7 @@
               color="neutral"
               class="md:hidden"
             />
-            <ColorModeToggle />
+            <CommonColorModeToggle />
           </div>
         </div>
       </nav>
